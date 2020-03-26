@@ -30,6 +30,8 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+global $sejoli_reward;
+
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
@@ -79,9 +81,6 @@ function deactivate_sejoli_reward() {
 	Sejoli_Reward_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_sejoli_reward' );
-register_deactivation_hook( __FILE__, 'deactivate_sejoli_reward' );
-
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
@@ -114,4 +113,7 @@ $update_checker = Puc_v4_Factory::buildUpdateChecker(
 
 $update_checker->setBranch('master');
 
-run_sejoli_reward();
+add_action('sejoli/init', 	'run_sejoli_reward');
+
+register_activation_hook( __FILE__, 'activate_sejoli_reward' );
+register_deactivation_hook( __FILE__, 'deactivate_sejoli_reward' );

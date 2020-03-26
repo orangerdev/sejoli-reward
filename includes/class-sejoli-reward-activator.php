@@ -1,14 +1,6 @@
 <?php
 
-/**
- * Fired during plugin activation
- *
- * @link       https://ridwan-arifandi.com
- * @since      1.0.0
- *
- * @package    Sejoli_Reward
- * @subpackage Sejoli_Reward/includes
- */
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**
  * Fired during plugin activation.
@@ -31,6 +23,24 @@ class Sejoli_Reward_Activator {
 	 */
 	public static function activate() {
 
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'sejolisa_reward_points';
+
+		if(!Capsule::schema()->hasTable( $table )):
+            Capsule::schema()->create( $table, function($table){
+                $table->increments  ('ID');
+                $table->date        ('created_at');
+                $table->integer     ('order_id');
+                $table->string      ('order_status');
+                $table->integer     ('product_id');
+                $table->integer     ('user_id');
+                $table->integer     ('point');
+                $table->enum        ('type', array('in', 'out'));
+                $table->integer     ('reward_id')->default(0);
+                $table->text        ('meta_data')->nullable();
+            });
+        endif;
 	}
 
 }

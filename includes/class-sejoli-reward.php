@@ -106,6 +106,15 @@ class Sejoli_Reward {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-sejoli-reward-loader.php';
 
 		/**
+		 * The class responsible for modelling data.
+		 */
+		if(!class_exists('\SejoliSA\Model')) :
+			require_once SEJOLISA_DIR . 'models/main.php';
+		endif;
+
+		require_once SEJOLI_REWARD_DIR . 'models/reward.php';
+
+		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
@@ -154,6 +163,7 @@ class Sejoli_Reward {
 	private function define_admin_hooks() {
 
 		$admin = new Sejoli_Reward\Admin( $this->get_plugin_name(), $this->get_version() );
+		$this->loader->add_action( 'sejoli/database/setup',			$admin, 'register_database', 1);
 
 		$reward  = new Sejoli_Reward\Admin\Reward( $this->get_plugin_name(), $this->get_version() );
 
