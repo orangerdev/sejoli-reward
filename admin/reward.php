@@ -172,12 +172,86 @@ class Reward {
 		switch($column_name) :
 
 			case 'sejoli-reward-point' :
-			
+
 				echo carbon_get_post_meta($post_id, 'reward_point');
 				break;
 
 		endswitch;
 
+	}
+
+	/**
+	 * Add reward point setup in product fields
+	 * Hooked via filter sejoli/product/fields, priority 8
+	 * @since 	1.0.0
+	 * @param 	array 	$fields
+	 * @return 	array
+	 */
+	public function set_product_fields($fields) {
+
+		$fields[]	= array(
+			'title'		=> __('Poin', 'sejoli-reward'),
+			'fields'	=> array(
+				Field::make( 'separator', 'sep_reward' , __('Pengaturan Poin', 'sejoli-reward'))
+					->set_classes('sejoli-with-help'),
+
+				Field::make('text', 'reward_point', __('Poin yang didapatkan dari pembelian produk ini', 'sejoli-reward'))
+					->set_attribute('type', 'number')
+					->set_attribute('min', 0)
+					->set_default_value(0)
+			)
+		);
+
+		return $fields;
+	}
+
+	/**
+	 * Add reward point setting  in user group fields
+	 * Hooked via filter sejoli/user-group/fields, priority 12
+	 * @since 	1.0.0
+	 * @param 	array $fields
+	 * @return  array
+	 */
+	public function set_user_group_fields($fields) {
+
+		$extra_fields = array(
+
+			Field::make('checkbox', 'group_reward_enable', __('Aktikan poin reward', 'sejoli-reward')),
+
+			Field::make('text', 	'group_reward_point',  __('Poin reward', 'sejoli-reward'))
+				->set_attribute('type', 'number')
+				->set_attribute('min', 0)
+				->set_default_value(0)
+				->set_conditional_logic(array(
+					array(
+						'field'	=> 'group_reward_enable',
+						'value'	=> true
+					)
+				))
+		);
+
+		array_splice($fields, 2, 0, $extra_fields);
+
+		return $fields;
+	}
+
+	/**
+	 * Add reward point in commssing fields
+	 * Hooked via filter sejoli/product/commission/fields, priority 12
+	 * @since 	1.0.0
+	 * @param 	array $fields
+	 * @return 	array
+	 */
+	public function set_commission_fields($fields) {
+
+		$fields = $fields + array(
+			Field::make('text', 'point', __('Poin Reward', 'sejoli-reward'))
+				->set_default_value(0)
+				->set_attribute('type', 'number')
+				->set_attribute('min',	0)
+		);
+
+		return $fields;
 	}
 
 }
