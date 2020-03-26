@@ -115,6 +115,7 @@ class Sejoli_Reward {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/reward.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
@@ -154,8 +155,12 @@ class Sejoli_Reward {
 
 		$admin = new Sejoli_Reward\Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_scripts' );
+		$reward  = new Sejoli_Reward\Admin\Reward( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'init',							$reward, 'register_post_type', 	1222);
+		$this->loader->add_action( 'carbon_fields_register_fields',	$reward, 'setup_reward_fields', 1222);
+		$this->loader->add_filter( 'manage_posts_columns',			$reward, 'modify_post_columns',	1222, 2);
+		$this->loader->add_action( 'manage_posts_custom_column',	$reward, 'display_data_in_post_columns', 1222, 2);
 
 	}
 
@@ -169,9 +174,6 @@ class Sejoli_Reward {
 	private function define_public_hooks() {
 
 		$public = new Sejoli_Reward\Front( $this->get_plugin_name(), $this->get_version() );
-
-		$this->loader->add_action( 'wp_enqueue_scripts', $public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $public, 'enqueue_scripts' );
 
 	}
 
