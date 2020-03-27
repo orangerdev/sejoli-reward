@@ -254,4 +254,19 @@ class Reward {
 		return $fields;
 	}
 
+	/**
+	 * Set reward point to product meta data
+	 * Hooked via filter sejoli/product/meta-data, priority 122
+	 * @since 	1.0.0
+	 * @param 	WP_Post $product
+	 * @return 	WP_Post
+	 */
+	public function set_product_point(\WP_Post $product) {
+
+		$product->reward_point = absint(carbon_get_post_meta($product->ID, 'reward_point'));
+		
+		return $product;
+
+	}
+
 }

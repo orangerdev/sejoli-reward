@@ -39,6 +39,7 @@ class Sejoli_Reward_Activator {
                 $table->enum        ('type', array('in', 'out'));
                 $table->integer     ('reward_id')->default(0);
                 $table->text        ('meta_data')->nullable();
+				$table->boolean		('valid_point');
             });
         endif;
 	}

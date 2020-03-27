@@ -76,6 +76,7 @@ class Sejoli_Reward {
 
 		$this->load_dependencies();
 		$this->set_locale();
+		$this->register_cli();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
@@ -118,19 +119,29 @@ class Sejoli_Reward {
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-sejoli-reward-i18n.php';
+		require_once SEJOLI_REWARD_DIR . 'includes/class-sejoli-reward-i18n.php';
+
+		/**
+		 * The files responsible for defining all functions that will work as helper
+		 */
+		require_once SEJOLI_REWARD_DIR . 'functions/reward.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/reward.php';
+		require_once SEJOLI_REWARD_DIR . 'admin/admin.php';
+		require_once SEJOLI_REWARD_DIR . 'admin/reward.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/public.php';
+		require_once SEJOLI_REWARD_DIR . 'public/public.php';
+
+		/**
+		 * The class responsible for defining CLI command
+		 */
+		require_once SEJOLI_REWARD_DIR . 'cli/reward.php';
 
 		$this->loader = new Sejoli_Reward_Loader();
 
@@ -154,6 +165,22 @@ class Sejoli_Reward {
 	}
 
 	/**
+	 * Register CLI command
+	 * @since 	1.0.0
+	 * @return 	void
+	 */
+	private function register_cli() {
+
+		if ( !class_exists( 'WP_CLI' ) ) :
+			return;
+		endif;
+
+		$reward 	= new Sejoli_Reward\CLI\Reward();
+
+		WP_CLI::add_command('sejolisa reward', $reward);
+	}
+
+	/**
 	 * Register all of the hooks related to the admin area functionality
 	 * of the plugin.
 	 *
@@ -171,6 +198,7 @@ class Sejoli_Reward {
 		$this->loader->add_action( 'carbon_fields_register_fields',	$reward, 'setup_reward_fields', 1222);
 		$this->loader->add_filter( 'manage_posts_columns',			$reward, 'modify_post_columns',	1222, 2);
 		$this->loader->add_action( 'manage_posts_custom_column',	$reward, 'display_data_in_post_columns', 1222, 2);
+		$this->loader->add_filter( 'sejoli/product/meta-data',		$reward, 'set_product_point',		122);
 		$this->loader->add_filter( 'sejoli/product/fields',			$reward, 'set_product_fields',		12);
 		$this->loader->add_filter( 'sejoli/user-group/fields',		$reward, 'set_user_group_fields', 	12);
 		$this->loader->add_filter( 'sejoli/product/commission/fields',	$reward, 'set_commission_fields', 12);
