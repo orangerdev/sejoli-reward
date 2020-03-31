@@ -77,7 +77,7 @@ Class Reward extends \SejoliSA\Model
     static public function set_order_status($status) {
 
         $available_status   = apply_filters('sejoli/order/status', []);
-        self::$order_status = (!in_array($status, $available_status)) ? 'on-hold' : $status;
+        self::$order_status = !array_key_exists($status, $available_status) ? 'on-hold' : $status;
 
         return new static;
     }
@@ -102,17 +102,6 @@ Class Reward extends \SejoliSA\Model
 
         if(in_array(self::$action, array('add', 'reduce'))) :
 
-            if(empty(self::$order_status)) :
-                self::set_valid(false);
-                self::set_message( __('Order status tidak valid', 'sejoli-reward'));
-            endif;
-
-
-            if(!is_a(self::$product, 'WP_Post') || 'sejoli-product' !== self::$product->post_type) :
-                self::set_valid(false);
-                self::set_message( __('Produk tidak valid', 'sejoli-reward'));
-            endif;
-
             if(!is_a(self::$user, 'WP_User')) :
                 self::set_valid(false);
                 self::set_message( __('User tidak valid', 'sejoli-reward'));
@@ -135,6 +124,17 @@ Class Reward extends \SejoliSA\Model
             if(empty(self::$order_id)) :
                 self::set_valid(false);
                 self::set_message( __('Order ID tidak boleh kosong', 'sejoli-reward'));
+            endif;
+
+            if(empty(self::$order_status)) :
+                self::set_valid(false);
+                self::set_message( __('Order status tidak valid', 'sejoli-reward'));
+            endif;
+
+
+            if(!is_a(self::$product, 'WP_Post') || 'sejoli-product' !== self::$product->post_type) :
+                self::set_valid(false);
+                self::set_message( __('Produk tidak valid', 'sejoli-reward'));
             endif;
 
         endif;
@@ -224,6 +224,95 @@ Class Reward extends \SejoliSA\Model
         return new static;
     }
 
+    /**
+     * Get available all user point
+     * @since   1.0.0
+     */
+    static public function get_available_point_all_users() {
+
+        global $wpdb;
+
+        parent::$table = self::$table;
+
+        $query  = Capsule::table( Capsule::raw( self::table() . ' AS reward' ))
+                    ->select(
+                        'reward.user_id',
+                        'user.display_name',
+                        'user.user_email',
+                        Capsule::raw(
+                            'SUM(CASE WHEN type = "in" THEN point ELSE 0 END) AS added_point'
+                        ),
+                        Capsule::raw(
+                            'SUM(CASE WHEN type = "out" THEN point ELSE 0 END) AS reduce_point'
+                        ),
+                        Capsule::raw(
+                            'SUM(CASE WHEN type = "in" THEN point ELSE -point END) AS available_point'
+                        )
+                    )
+                    ->join(
+                        $wpdb->users . ' AS user', 'user.ID', '=', 'reward.user_id'
+                    )
+                    ->where('valid_point', true)
+                    ->groupBy('user_id');
+        $result = $query->get();
+
+        if($result) :
+
+            self::set_valid(true);
+            self::set_respond('points', $result);
+
+        else :
+
+            self::set_valid(false);
+            self::set_message( __('No point data', 'sejoli-reward'));
+
+        endif;
+
+        return new static;
+    }
+
+    /**
+     * Get available user point
+     * @since   1.0.0
+     */
+    static public function get_available_point_for_single_user() {
+
+        global $wpdb;
+
+        parent::$table = self::$table;
+
+        $query  = Capsule::table( self::table() )
+                    ->select(
+                        'user_id',
+                        Capsule::raw(
+                            'SUM(CASE WHEN type = "in" THEN point ELSE 0 END) AS added_point'
+                        ),
+                        Capsule::raw(
+                            'SUM(CASE WHEN type = "out" THEN point ELSE 0 END) AS reduce_point'
+                        ),
+                        Capsule::raw(
+                            'SUM(CASE WHEN type = "in" THEN point ELSE -point END) AS available_point'
+                        )
+                    )
+                    ->where('valid_point', true)
+                    ->where('user_id', self::$user_id)
+                    ->first();
+
+        if($query) :
+
+            self::set_valid(true);
+            self::set_respond('point', $query);
+
+        else :
+
+            self::set_valid(false);
+            self::set_message( sprintf( __('No point for user %s', 'sejoli-reward'), self::$user_id));
+
+        endif;
+
+        return new static;
+    }
+
 
     /**
      * Add point with OUT type
@@ -240,9 +329,9 @@ Class Reward extends \SejoliSA\Model
 
             $point = [
                 'created_at'   => current_time('mysql'),
-                'order_id'     => self::$order_id,
-                'order_status' => self::$order_status,
-                'product_id'   => self::$product->ID,
+                'order_id'     => 0,
+                'order_status' => '',
+                'product_id'   => 0,
                 'user_id'      => self::$user->ID,
                 'point'        => self::$point,
                 'type'         => 'out',
