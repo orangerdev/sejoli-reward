@@ -264,7 +264,7 @@ class Order {
      * @return void
      */
     public function update_point_status_to_not_valid(array $order_data) {
-
+        sejoli_update_reward_point_validity($order_data['ID'], false);
     }
 
     /**
@@ -274,6 +274,6 @@ class Order {
      * @return void
      */
     public function update_point_status_to_valid(array $order_data) {
-
+        sejoli_update_reward_point_validity($order_data['ID'], true);
     }
 }

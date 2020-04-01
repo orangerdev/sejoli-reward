@@ -216,3 +216,19 @@ function sejoli_exchange_reward($reward_id, $user_id = 0) {
     return $response;
 
 }
+
+/**
+ * Update multiple reward point valid point by order ID
+ * @since   1.0.0
+ * @param   integer  $order_id
+ * @param   boolean  $valid
+ * @return  void
+ */
+function sejoli_update_reward_point_validity($order_id, $valid = false) {
+
+    $response   = \SEJOLI_REWARD\Model\Reward::reset()
+                        ->set_order_id($order_id)
+                        ->set_valid_point($valid)
+                        ->update_valid_point()
+                        ->respond();
+}

@@ -119,12 +119,16 @@ Class Reward extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('add'))) :
+        if(in_array(self::$action, array('add', 'update-valid-point'))) :
 
             if(empty(self::$order_id)) :
                 self::set_valid(false);
                 self::set_message( __('Order ID tidak boleh kosong', 'sejoli-reward'));
             endif;
+
+        endif;
+
+        if(in_array(self::$action, array('add'))) :
 
             if(empty(self::$order_status)) :
                 self::set_valid(false);
@@ -345,6 +349,32 @@ Class Reward extends \SejoliSA\Model
 
             self::set_valid(true);
             self::set_respond('point', $point);
+
+        endif;
+
+        return new static;
+    }
+
+    /**
+     * Update valid point
+     * @since
+     */
+    static public function update_valid_point() {
+
+        self::set_action('update-valid-point');
+        self::validate();
+
+        if(false !== self::$valid) :
+
+            parent::$table = self::$table;
+
+            Capsule::table(self::table())
+                            ->where('order_id', self::$order_id)
+                            ->update(array(
+                                'valid_point'   => self::$valid_point
+                            ));
+
+            self::set_valid(true);
 
         endif;
 
