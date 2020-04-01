@@ -189,16 +189,146 @@ class Reward extends \SejoliSA\CLI {
 
         list($order_id) = $args;
 
-        $order_response = sejolisa_get_order(array('ID' => $order_id));
+        $order_response        = sejolisa_get_order(array('ID' => $order_id));
+        $user_group_product_point = $default_product_point = 0;
+        $buyer_group           = '-';
+        $affiliate_points      = array();
 
         if(false !== $order_response['valid']) :
 
             $order = $order_response['orders'];
 
             if(property_exists($order['product'], 'reward_point')) :
-                __debug($order['product']->reward_point);
+
+                $default_product_point = $order['product']->reward_point;
+                $product_id            = $order['product_id'];
+
             endif;
+
+            $user_group          = sejolisa_get_user_group($order['user_id']);
+            $buyer_group         = (isset($user_group['name'])) ? $user_group['name'] : $buyer_group;
+            $product_group_setup = $user_group;
+
+            if(array_key_exists($product_id, $product_group_setup['per_product'])) :
+                $product_group_setup = $product_group_setup['per_product'][$product_id];
+            endif;
+
+            if($product_group_setup['reward_enable']) :
+                $user_group_product_point = $product_group_setup['reward_point'];
+            endif;
+
+            if(!empty($order['affiliate_id'])) :
+
+                $affiliates    = array();
+                $affiliates[1] = $affiliate_id = intval($order['affiliate_id']);
+                $uplines       = sejolisa_user_get_uplines($affiliate_id, count($order['product']->affiliate));
+
+                if( is_array($uplines) && 0 < count($uplines)) :
+                    foreach( $uplines as $tier => $upline_id ) :
+        				$affiliates[$tier + 1] = $upline_id;
+        			endforeach;
+                endif;
+
+                foreach($affiliates as $tier => $affiliate_id) :
+
+                    $per_product_commissions = $product_commissions = array();
+                    $product_commissions = $order['product']->affiliate;
+
+                    $affiliate_group = sejolisa_get_user_group($affiliate_id);
+                    $general_group_commissions = $affiliate_group['commissions'];
+
+                    if(array_key_exists($product_id, $affiliate_group['per_product'])) :
+                        $per_product_commissions = $affiliate_group['per_product'][$product_id]['commissions'];
+                    endif;
+
+                    $enable_reward = false;
+                    $type = $point = null;
+
+
+                    /**
+                     * Check each product setup in user group
+                     */
+                    if(
+                        array_key_exists($tier, $per_product_commissions) &&
+                        false !== $per_product_commissions[$tier]['reward_enable']
+                    ) :
+
+                        $enable_reward = true;
+                        $type          = 'per product in user group';
+                        $point         = $per_product_commissions[$tier]['reward_point'];
+
+                    endif;
+
+                    /**
+                     * Check in general setup in user groups
+                     */
+                    if(
+                        false === $enable_reward &&
+                        array_key_exists($tier, $general_group_commissions)  &&
+                        false !== $general_group_commissions[$tier]['reward_enable']
+                    ) :
+
+                        $enable_reward = true;
+                        $type          = 'general user group setting';
+                        $point         = $general_group_commissions[$tier]['reward_point'];
+
+                    endif;
+
+                    /**
+                     * Check in general setup in user groups
+                     */
+                    if(
+                        false === $enable_reward &&
+                        array_key_exists($tier, $product_commissions)  &&
+                        false !== $product_commissions[$tier]['reward_enable']
+                    ) :
+
+                        $enable_reward = true;
+                        $type          = 'product setting';
+                        $point         = $product_commissions[$tier]['reward_point'];
+
+                    endif;
+
+
+                    $affiliate_points[] = array(
+                        'tier'  => $tier,
+                        'id'    => $affiliate_id,
+                        'group' => $affiliate_group['name'],
+                        'point' => $point,
+                        'type'  => $type
+                    );
+
+                endforeach;;
+
+            endif;
+
         endif;
+
+        $this->render(array(
+            array(
+                'default_product_point'    => $default_product_point,
+                'user_group_product_point' => $user_group_product_point,
+                'buyer_group'              => $buyer_group,
+                'product_id'               => $order['product_id']
+            )
+        ),'yaml',array(
+            'product_id',
+            'default_product_point',
+            'user_group_product_point',
+            'buyer_group'
+        ));
+
+        $this->render(
+            $affiliate_points,
+            'table',
+            array(
+                'tier',
+                'id',
+                'group',
+                'point',
+                'type'
+            )
+        );
     }
 
 }
