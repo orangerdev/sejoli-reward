@@ -195,7 +195,8 @@ class Sejoli_Reward {
 
 		$order  = new Sejoli_Reward\Admin\Order( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'sejoli/order/new',						$order, 'add_reward_point_for_buyer', 		122);
+		$this->loader->add_action( 'sejoli/order/new',						$order, 'add_reward_point_for_buyer', 		8);
+		$this->loader->add_action( 'sejoli/order/commission', 				$order, 'add_reward_point_for_affiliate',	122, 5);
 		$this->loader->add_action( 'sejoli/order/set-status/on-hold',		$order, 'update_point_status_to_not_valid', 122);
 		$this->loader->add_action( 'sejoli/order/set-status/in-progress',	$order, 'update_point_status_to_not_valid', 122);
 		$this->loader->add_action( 'sejoli/order/set-status/shipped',		$order, 'update_point_status_to_not_valid', 122);
