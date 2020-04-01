@@ -197,7 +197,7 @@ Class Reward extends \SejoliSA\Model
                     'type'         => 'in',
                     'reward_id'    => self::$reward_id,
                     'meta_data'    => serialize(self::$meta_data),
-                    'valid_point'  => true
+                    'valid_point'  => self::$valid_point
                 ];
 
                 $point['ID'] = Capsule::table(self::table())
@@ -337,7 +337,7 @@ Class Reward extends \SejoliSA\Model
                 'type'         => 'out',
                 'reward_id'    => self::$reward_id,
                 'meta_data'    => serialize(self::$meta_data),
-                'valid_point'  => true
+                'valid_point'  => self::$valid_point
             ];
 
             $point['ID'] = Capsule::table(self::table())
