@@ -199,8 +199,9 @@ class Sejoli_Reward {
 		$this->loader->add_filter( 'manage_posts_columns',			$reward, 'modify_post_columns',	1222, 2);
 		$this->loader->add_action( 'manage_posts_custom_column',	$reward, 'display_data_in_post_columns', 1222, 2);
 		$this->loader->add_filter( 'sejoli/product/meta-data',		$reward, 'set_product_point',		122);
-		$this->loader->add_filter( 'sejoli/product/fields',			$reward, 'set_product_fields',		12);
-		$this->loader->add_filter( 'sejoli/user-group/fields',		$reward, 'set_user_group_fields', 	12);
+
+		$this->loader->add_filter( 'sejoli/product/fields',					$reward, 'set_product_fields',		12);
+		$this->loader->add_filter( 'sejoli/user-group/fields',				$reward, 'set_user_group_fields', 	12);
 		$this->loader->add_filter( 'sejoli/user-group/per-product/fields',	$reward, 'set_user_group_per_product_fields', 12, 2);
 		$this->loader->add_filter( 'sejoli/product/commission/fields',		$reward, 'set_commission_fields', 12);
 		$this->loader->add_filter( 'sejoli/user-group/detail',				$reward, 'set_user_group_detail', 12, 4);

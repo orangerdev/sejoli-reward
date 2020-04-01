@@ -299,7 +299,17 @@ class Reward {
 	 */
 	public function set_product_point(\WP_Post $product) {
 
+		$commissions           = carbon_get_post_meta($product->ID, 'sejoli_commission');
 		$product->reward_point = absint(carbon_get_post_meta($product->ID, 'reward_point'));
+
+		foreach( (array) $commissions as $i => $commission) :
+
+			$tier = $i + 1;
+
+			$product->affiliate[$tier]['reward_enable']	= $commission['reward_enable'];
+			$product->affiliate[$tier]['reward_point']	= absint($commission['reward_point']);
+			
+		endforeach;
 
 		return $product;
 
