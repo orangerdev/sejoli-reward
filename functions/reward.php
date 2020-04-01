@@ -15,6 +15,7 @@ function sejoli_reward_add_point(array $args) {
         'user_id'      => NULL,
         'point'        => 0,
         'reward_id'    => 0,
+        'valid_point'  => false,
         'meta_data'    => array()
     ));
 
@@ -26,6 +27,7 @@ function sejoli_reward_add_point(array $args) {
                         ->set_reward($args['reward_id'])
                         ->set_meta_data($args['meta_data'])
                         ->set_point($args['point'])
+                        ->set_valid_point($args['valid_point'])
                         ->add_point()
                         ->respond();
 

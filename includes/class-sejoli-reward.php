@@ -130,6 +130,7 @@ class Sejoli_Reward {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once SEJOLI_REWARD_DIR . 'admin/admin.php';
+		require_once SEJOLI_REWARD_DIR . 'admin/order.php';
 		require_once SEJOLI_REWARD_DIR . 'admin/reward.php';
 
 		/**
@@ -191,6 +192,16 @@ class Sejoli_Reward {
 
 		$admin = new Sejoli_Reward\Admin( $this->get_plugin_name(), $this->get_version() );
 		$this->loader->add_action( 'sejoli/database/setup',			$admin, 'register_database', 1);
+
+		$order  = new Sejoli_Reward\Admin\Order( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'sejoli/order/new',						$order, 'add_reward_point_for_buyer', 		122);
+		$this->loader->add_action( 'sejoli/order/set-status/on-hold',		$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/in-progress',	$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/shipped',		$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/refunded',		$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/cancelled',		$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/completed',		$order, 'update_point_status_to_valid', 122);
 
 		$reward  = new Sejoli_Reward\Admin\Reward( $this->get_plugin_name(), $this->get_version() );
 
