@@ -245,17 +245,42 @@ Class Reward extends \SejoliSA\Model
 
             parent::$table = self::$table;
 
-            $point = Capsule::table(self::table())
+            $query = Capsule::table(self::table())
                             ->where(array(
                                 'order_id'    => self::$order_id,
                                 'user_id'     => self::$user->ID,
                                 'type'        => 'in',
                                 'valid_point' => true
-                            ))
+                            ));
+
+            $point = $query->first();
+
+            if($point) :
+
+                self::set_valid(true);
+                self::set_respond('point', $point);
+
+            else :
+
+                $query = Capsule::table(self::table())
+                                ->where(array(
+                                    'order_id'    => self::$order_id,
+                                    'user_id'     => self::$user->ID,
+                                ))
                             ->first();
 
-            self::set_valid(true);
-            self::set_respond('point', $point);
+                if($point) :
+
+                    self::set_valid(true);
+                    self::set_respond('point', $point);
+
+                else :
+
+                    self::set_valid(false);
+
+                endif;
+
+            endif;
 
         endif;
 

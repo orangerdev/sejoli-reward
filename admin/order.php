@@ -221,10 +221,10 @@ class Order {
         if(0 < $point) :
 
             $response = sejoli_reward_add_point(array(
-                'order_id'     => $order_data['ID'],
+                'order_id'     => intval($order_data['ID']),
                 'product_id'   => $product_id,
                 'order_status' => $order_data['status'],
-                'user_id'      => $affiliate_id,
+                'user_id'      => intval($affiliate_id),
                 'point'        => $point,
                 'reward_id'    => 0,
                 'valid_point'  => false,
@@ -291,7 +291,7 @@ class Order {
 
         if(
             'completed' === $order_detail['order_data']['status'] &&
-            'buyer' === $recipient_type
+            in_array($recipient_type, array('buyer', 'affiliate'))
         ) :
 
             switch($media) :
@@ -310,12 +310,14 @@ class Order {
 
             endswitch;
 
+            $user_id = ('affiliate' === $recipient_type)  ? $order_detail['affiliate_data']->ID : $order_detail['order_data']['user_id'];
+
             $single_response = sejoli_get_single_user_point_from_an_order(array(
                 'order_id'  => $order_detail['order_data']['ID'],
-                'user_id'   => $order_detail['order_data']['user_id']
+                'user_id'   => $user_id
             ));
 
-            $all_response = sejoli_reward_get_user_point($order_detail['order_data']['user_id']);
+            $all_response = sejoli_reward_get_user_point($user_id);
 
             if(
                 false !== $single_response['valid'] &&
