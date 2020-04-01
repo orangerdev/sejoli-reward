@@ -175,4 +175,30 @@ class Reward extends \SejoliSA\CLI {
         );
     }
 
+    /**
+     * Get possible point by an order
+     *
+     * <order_id>
+     * : The order id
+     *
+     *  wp sejolisa reward calculate_point 2193
+     *
+     * @when after_wp_load
+     */
+    public function calculate_point(array $args) {
+
+        list($order_id) = $args;
+
+        $order_response = sejolisa_get_order(array('ID' => $order_id));
+
+        if(false !== $order_response['valid']) :
+
+            $order = $order_response['orders'];
+
+            if(property_exists($order['product'], 'reward_point')) :
+                __debug($order['product']->reward_point);
+            endif;
+        endif;
+    }
+
 }

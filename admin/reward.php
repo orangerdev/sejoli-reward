@@ -236,6 +236,35 @@ class Reward {
 	}
 
 	/**
+	 * Add reward point setting in each product setup in user group fields
+	 * Hooked via filter sejoli/user-group/per-product/fields, priority 12
+	 * @since 	1.0.0
+	 * @param 	array $fields
+	 * @return 	array
+	 */
+	public function set_user_group_per_product_fields($fields) {
+
+		$extra_fields = array(
+			Field::make('checkbox', 'reward_enable', __('Aktikan poin reward', 'sejoli-reward')),
+
+			Field::make('text', 	'reward_point',  __('Poin reward', 'sejoli-reward'))
+				->set_attribute('type', 'number')
+				->set_attribute('min', 0)
+				->set_default_value(0)
+				->set_conditional_logic(array(
+					array(
+						'field'	=> 'reward_enable',
+						'value'	=> true
+					)
+				))
+		);
+
+		array_splice($fields, 2, 0, $extra_fields);
+
+		return $fields;
+	}
+
+	/**
 	 * Add reward point in commssing fields
 	 * Hooked via filter sejoli/product/commission/fields, priority 12
 	 * @since 	1.0.0
@@ -245,10 +274,17 @@ class Reward {
 	public function set_commission_fields($fields) {
 
 		$fields = $fields + array(
-			Field::make('text', 'point', __('Poin Reward', 'sejoli-reward'))
+			Field::make('checkbox',		'reward_enable', __('Aktifkan poin reward', 'sejoli-reward')),
+			Field::make('text', 		'reward_point', __('Poin Reward', 'sejoli-reward'))
 				->set_default_value(0)
 				->set_attribute('type', 'number')
 				->set_attribute('min',	0)
+				->set_conditional_logic(array(
+					array(
+						'field'	=> 'reward_enable',
+						'value'	=> true
+					)
+				))
 		);
 
 		return $fields;
@@ -264,9 +300,83 @@ class Reward {
 	public function set_product_point(\WP_Post $product) {
 
 		$product->reward_point = absint(carbon_get_post_meta($product->ID, 'reward_point'));
-		
+
 		return $product;
 
 	}
 
+	/**
+	 * Set reward point in user group detail
+	 * Hooked via filter sejoli/user-group/detail, priority 12
+	 * @since 	1.0.0
+	 * @param 	array  	$group_detail
+	 * @param 	integer $group_id
+	 * @param 	array 	$commissions 	Commission field values
+	 * @param 	array 	$per_product	Per product field values
+	 * @return 	array
+	 */
+	public function set_user_group_detail(array $group_detail, $group_id, $commissions, $per_product) {
+
+		$group_detail['reward_enable'] = carbon_get_post_meta($group_id, 'group_reward_enable');
+		$group_detail['reward_point']  = absint(carbon_get_post_meta($group_id, 'group_reward_point'));
+
+		// Setup reward point in commissions
+		if(is_array($commissions) && 0 < count($commissions)) :
+
+			foreach($commissions as $i => $commission) :
+				$tier = $i + 1;
+				$group_detail['commissions'][$tier]['reward_enable'] = $commission['reward_enable'];
+				$group_detail['commissions'][$tier]['reward_point']  = absint($commission['reward_point']);
+			endforeach;
+
+		endif;
+
+		// Setup reward point for each product
+		if(is_array($per_product) && 0 < count($per_product)) :
+
+			foreach($per_product as $i => $detail) :
+
+				$product_id = absint($detail['product']);
+
+				$group_detail['per_product'][$product_id]['reward_enable'] = $detail['reward_enable'];
+				$group_detail['per_product'][$product_id]['reward_point']  = absint($detail['reward_point']);
+
+				if(is_array($detail['commission']) && 0 < count($detail['commission'])) :
+
+					$per_product_commissions = $group_detail['per_product'][$product_id]['commissions'];
+
+					foreach($detail['commission'] as $i => $_commission) :
+
+						$tier = $i + 1;
+						$per_product_commissions[$tier]['reward_enable'] = $_commission['reward_enable'];
+						$per_product_commissions[$tier]['reward_point']  = absint($_commission['reward_point']);
+
+					endforeach;
+
+					$group_detail['per_product'][$product_id]['commissions'] = $per_product_commissions;
+
+				endif;
+
+			endforeach;
+
+		endif;
+
+		return $group_detail;
+	}
+
+
+	/**
+	 * Set reward point in user group detail
+	 * Hooked via filter sejoli/user-group/detail, priority 12
+	 * @since 	1.0.0
+	 * @param 	array  	$group_detail
+	 * @param 	integer $group_id
+	 * @return 	array
+	 */
+	public function set_user_group_per_product_detail(array $group_per_product_detail, $detail) {
+
+		$group_per_product_detail['reward_point'] = (isset($detail['point'])) ? absint($detail['point']) : 0;
+
+		return $group_per_product_detail;
+	}
 }
