@@ -102,11 +102,6 @@ Class Reward extends \SejoliSA\Model
 
         if(in_array(self::$action, array('add', 'reduce'))) :
 
-            if(!is_a(self::$user, 'WP_User')) :
-                self::set_valid(false);
-                self::set_message( __('User tidak valid', 'sejoli-reward'));
-            endif;
-
             if(empty(self::$point)) :
                 self::set_valid(false);
                 self::set_message( __('Poin tidak boleh kosong', 'sejoli-reward'));
@@ -119,7 +114,16 @@ Class Reward extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('add', 'update-valid-point'))) :
+        if(in_array(self::$action, array('add', 'reduce', 'get-single'))) :
+
+            if(!is_a(self::$user, 'WP_User')) :
+                self::set_valid(false);
+                self::set_message( __('User tidak valid', 'sejoli-reward'));
+            endif;
+
+        endif;
+
+        if(in_array(self::$action, array('add', 'update-valid-point', 'get-single'))) :
 
             if(empty(self::$order_id)) :
                 self::set_valid(false);
@@ -222,6 +226,36 @@ Class Reward extends \SejoliSA\Model
                 );
 
             endif;
+
+        endif;
+
+        return new static;
+    }
+
+    /**
+     * Get single user reward point from an order
+     * @since   1.0.0
+     */
+    static public function get_single_point() {
+
+        self::set_action('get-single');
+        self::validate();
+
+        if(false !== self::$valid) :
+
+            parent::$table = self::$table;
+
+            $point = Capsule::table(self::table())
+                            ->where(array(
+                                'order_id'    => self::$order_id,
+                                'user_id'     => self::$user->ID,
+                                'type'        => 'in',
+                                'valid_point' => true
+                            ))
+                            ->first();
+
+            self::set_valid(true);
+            self::set_respond('point', $point);
 
         endif;
 

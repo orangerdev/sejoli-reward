@@ -203,7 +203,7 @@ class Sejoli_Reward {
 		$this->loader->add_action( 'sejoli/order/set-status/refunded',			$order, 'update_point_status_to_not_valid', 122);
 		$this->loader->add_action( 'sejoli/order/set-status/cancelled',			$order, 'update_point_status_to_not_valid', 122);
 		$this->loader->add_action( 'sejoli/order/set-status/completed',			$order, 'update_point_status_to_valid', 	122);
-		// $this->loader->add_action( 'sejoli/notification/content/order-meta',	$order, 'add_point_info',					122, )
+		$this->loader->add_action( 'sejoli/notification/content/order-detail',	$order, 'add_point_info',					122, 4);
 
 		$reward  = new Sejoli_Reward\Admin\Reward( $this->get_plugin_name(), $this->get_version() );
 

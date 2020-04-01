@@ -276,4 +276,60 @@ class Order {
     public function update_point_status_to_valid(array $order_data) {
         sejoli_update_reward_point_validity($order_data['ID'], true);
     }
+
+    /**
+     * Add point information in notification
+     * Hooked via filter sejoli/notification/content/order-meta, priority 122
+     * @since   1.0.0
+     * @param   string  $content
+     * @param   string  $media
+     * @param   string  $recipient_type
+     * @param   array   $order_detail
+     * @return  string
+     */
+    public function add_point_info($content, $media, $recipient_type, $order_detail) {
+
+        if(
+            'completed' === $order_detail['order_data']['status'] &&
+            'buyer' === $recipient_type
+        ) :
+
+            switch($media) :
+
+                case 'email' :
+                    $info_content   = carbon_get_theme_option('info_point_email');
+                    break;
+
+                case 'whatsapp' :
+                    $info_content   = carbon_get_theme_option('info_point_whatsapp');
+                    break;
+
+                case 'sms' :
+                    $info_content   = carbon_get_theme_option('info_point_sms');
+                    break;
+
+            endswitch;
+
+            $single_response = sejoli_get_single_user_point_from_an_order(array(
+                'order_id'  => $order_detail['order_data']['ID'],
+                'user_id'   => $order_detail['order_data']['user_id']
+            ));
+
+            $all_response = sejoli_reward_get_user_point($order_detail['order_data']['user_id']);
+
+            if(
+                false !== $single_response['valid'] &&
+                false !== $all_response['valid']
+            ) :
+                $info_content = str_replace('{{new-point}}', $single_response['point']->point, $info_content);
+                $info_content = str_replace('{{all-point}}', $all_response['point']->available_point, $info_content);
+
+                $content .= $info_content;
+
+            endif;
+
+        endif;
+
+        return $content;
+    }
 }

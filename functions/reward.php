@@ -232,3 +232,25 @@ function sejoli_update_reward_point_validity($order_id, $valid = false) {
                         ->update_valid_point()
                         ->respond();
 }
+
+/**
+ * Get single user reward point from and order
+ * @since   1.0.0
+ * @param   array  $args
+ * @return  array
+ */
+function sejoli_get_single_user_point_from_an_order(array $args) {
+
+    $args   = wp_parse_args($args, array(
+        'order_id'  => NULL,
+        'user_id'   => NULL
+    ));
+
+    $response   = \SEJOLI_REWARD\Model\Reward::reset()
+                        ->set_order_id($args['order_id'])
+                        ->set_user($args['user_id'])
+                        ->get_single_point()
+                        ->respond();
+
+    return $response;
+}
