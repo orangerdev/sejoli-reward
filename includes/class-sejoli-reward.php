@@ -195,14 +195,15 @@ class Sejoli_Reward {
 
 		$order  = new Sejoli_Reward\Admin\Order( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'sejoli/order/new',						$order, 'add_reward_point_for_buyer', 		8);
-		$this->loader->add_action( 'sejoli/order/commission', 				$order, 'add_reward_point_for_affiliate',	122, 5);
-		$this->loader->add_action( 'sejoli/order/set-status/on-hold',		$order, 'update_point_status_to_not_valid', 122);
-		$this->loader->add_action( 'sejoli/order/set-status/in-progress',	$order, 'update_point_status_to_not_valid', 122);
-		$this->loader->add_action( 'sejoli/order/set-status/shipped',		$order, 'update_point_status_to_not_valid', 122);
-		$this->loader->add_action( 'sejoli/order/set-status/refunded',		$order, 'update_point_status_to_not_valid', 122);
-		$this->loader->add_action( 'sejoli/order/set-status/cancelled',		$order, 'update_point_status_to_not_valid', 122);
-		$this->loader->add_action( 'sejoli/order/set-status/completed',		$order, 'update_point_status_to_valid', 122);
+		$this->loader->add_action( 'sejoli/order/new',							$order, 'add_reward_point_for_buyer', 		8);
+		$this->loader->add_action( 'sejoli/order/commission', 					$order, 'add_reward_point_for_affiliate',	122, 5);
+		$this->loader->add_action( 'sejoli/order/set-status/on-hold',			$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/in-progress',		$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/shipped',			$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/refunded',			$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/cancelled',			$order, 'update_point_status_to_not_valid', 122);
+		$this->loader->add_action( 'sejoli/order/set-status/completed',			$order, 'update_point_status_to_valid', 	122);
+		// $this->loader->add_action( 'sejoli/notification/content/order-meta',	$order, 'add_point_info',					122, )
 
 		$reward  = new Sejoli_Reward\Admin\Reward( $this->get_plugin_name(), $this->get_version() );
 
@@ -210,8 +211,9 @@ class Sejoli_Reward {
 		$this->loader->add_action( 'carbon_fields_register_fields',	$reward, 'setup_reward_fields', 1222);
 		$this->loader->add_filter( 'manage_posts_columns',			$reward, 'modify_post_columns',	1222, 2);
 		$this->loader->add_action( 'manage_posts_custom_column',	$reward, 'display_data_in_post_columns', 1222, 2);
-		$this->loader->add_filter( 'sejoli/product/meta-data',		$reward, 'set_product_point',		122);
+		$this->loader->add_filter( 'sejoli/product/meta-data',		$reward, 'set_product_point',			122);
 
+		$this->loader->add_filter( 'sejoli/notification/fields',    		$reward, 'set_noficication_fields', 120);
 		$this->loader->add_filter( 'sejoli/product/fields',					$reward, 'set_product_fields',		12);
 		$this->loader->add_filter( 'sejoli/user-group/fields',				$reward, 'set_user_group_fields', 	12);
 		$this->loader->add_filter( 'sejoli/user-group/per-product/fields',	$reward, 'set_user_group_per_product_fields', 12, 2);

@@ -308,7 +308,7 @@ class Reward {
 
 			$product->affiliate[$tier]['reward_enable']	= $commission['reward_enable'];
 			$product->affiliate[$tier]['reward_point']	= absint($commission['reward_point']);
-			
+
 		endforeach;
 
 		return $product;
@@ -388,5 +388,43 @@ class Reward {
 		$group_per_product_detail['reward_point'] = (isset($detail['point'])) ? absint($detail['point']) : 0;
 
 		return $group_per_product_detail;
+	}
+
+	/**
+	 * Add notification setting fields
+	 * Hooke via filter sejoli/notification/fields, priority 122
+	 * @since 	1.0.0
+	 * @param 	array $fields
+	 */
+	public function set_noficication_fields(array $fields) {
+
+		$fields['point'] = [
+			'title'		=> __('Informasi Poin', 'sejoli'),
+			'fields'	=> array(
+				Field::make('separator', 'sep_info_point_email', __('Email', 'sejoli'))
+					->set_help_text(__('Pengturan konten untuk media email', 'sejoli')),
+
+				Field::make('rich_text', 'info_point_email', __('Konten', 'sejoli'))
+					->set_required(true)
+					->set_default_value('Selamat, Anda mendapatkan poin sebesar {{new-point}}! Total point anda sekarang adalah {{all-point}}'),
+
+				Field::make('separator', 'sep_info_point_whatsapp', __('Whatsapp', 'sejoli'))
+					->set_help_text(__('Pengturan konten untuk media whatsapp', 'sejoli')),
+
+				Field::make('textarea', 'info_point_whatsapp', __('Konten', 'sejoli'))
+					->set_required(true)
+					->set_default_value('Selamat, Anda mendapatkan poin sebesar {{new-point}}! Total point anda sekarang adalah {{all-point}}'),
+
+				Field::make('separator', 'sep_info_point_sms', __('SMS', 'sejoli'))
+					->set_help_text(__('Pengturan konten untuk media SMS', 'sejoli')),
+
+				Field::make('textarea', 'info_point_sms', __('Konten', 'sejoli'))
+					->set_required(true)
+					->set_default_value('Total point anda sekarang {{all-point}}'),
+
+			)
+		];
+
+		return $fields;
 	}
 }
