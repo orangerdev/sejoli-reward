@@ -92,9 +92,12 @@ function sejoli_reward_get_user_point($user_id = 0) {
  * @return  array
  */
 function sejoli_reward_get_all_user_point($args = array()) {
-
-    $response   = \SEJOLI_REWARD\Model\Reward::reset()
-                        ->get_available_point_all_users()
+    $args = wp_parse_args($args, array(
+                'user_id' => NULL
+            ));
+    $response    = \SEJOLI_REWARD\Model\Reward::reset()
+                    ->set_filter_from_array($args)
+                    ->get_available_point_all_users()
                         ->respond();
 
     return $response;
@@ -265,10 +268,11 @@ function sejoli_get_single_user_point_from_an_order(array $args) {
 function sejoli_reward_get_history(array $args, $table = array()) {
 
     $args = wp_parse_args($args,[
-        'user_id'    => NULL,
-        'product_id' => NULL,
-        'reward_id'  => NULL,
-        'type'       => NULL
+        'user_id'     => NULL,
+        'product_id'  => NULL,
+        'reward_id'   => NULL,
+        'type'        => NULL,
+        'valid_point' => true
     ]);
 
     $table = wp_parse_args($table, [
@@ -289,8 +293,8 @@ function sejoli_reward_get_history(array $args, $table = array()) {
 
     if(isset($table['filter']['date-range']) && !empty($table['filter']['date-range'])) :
         list($start, $end) = explode(' - ', $table['filter']['date-range']);
-        $query = $query->set_filter('created_at', $start.' 00:00:00', '>=')
-                    ->set_filter('created_at', $end.' 23:59:59', '<=');
+        $query = $query->set_filter('created_at', $start , '>=')
+                    ->set_filter('created_at', $end, '<=');
     endif;
 
     if(0 < $table['length']) :

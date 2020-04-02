@@ -131,6 +131,16 @@ let sejoli_table;
             sejoli.helper.unblockUI('.sejoli-table-holder');
         });
 
+        $(document).on('click', '.toggle-search', function(){
+            $('.sejoli-form-filter-holder').toggle();
+        });
+
+        $(document).on('click', '.do-search', function(){
+            sejoli.helper.filterData();
+            sejoli_table.ajax.reload();
+            $('.sejoli-form-filter-holder').hide();
+        });
+
     });
 })(jQuery);
 </script>

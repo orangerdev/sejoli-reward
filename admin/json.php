@@ -74,7 +74,7 @@ class Json extends \SejoliSA\JSON {
 
         if(wp_verify_nonce($params['nonce'], 'sejoli-render-user-point-table')) :
 
-    		$return = sejoli_reward_get_all_user_point();
+    		$return = sejoli_reward_get_all_user_point($table['filter']);
 
             if(false !== $return['valid']) :
 

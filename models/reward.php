@@ -350,6 +350,9 @@ Class Reward extends \SejoliSA\Model
                     ->where('valid_point', true)
                     ->orderBy('available_point', 'DESC')
                     ->groupBy('user_id');
+
+        $query  = self::set_filter_query( $query );
+
         $result = $query->get();
 
         if($result) :
