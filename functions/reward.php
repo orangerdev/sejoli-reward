@@ -254,3 +254,64 @@ function sejoli_get_single_user_point_from_an_order(array $args) {
 
     return $response;
 }
+
+/**
+ * Get reward history
+ * @since   1.0.0
+ * @param   array  $args
+ * @param   array  $table
+ * @return  array
+ */
+function sejoli_reward_get_history(array $args, $table = array()) {
+
+    $args = wp_parse_args($args,[
+        'user_id'    => NULL,
+        'product_id' => NULL,
+        'reward_id'  => NULL,
+        'type'       => NULL
+    ]);
+
+    $table = wp_parse_args($table, [
+        'start'   => NULL,
+        'length'  => NULL,
+        'order'   => NULL,
+        'filter'  => NULL
+    ]);
+
+    if(isset($args['date-range']) && !empty($args['date-range'])) :
+        $table['filter']['date-range'] = $args['date-range'];
+        unset($args['date-range']);
+    endif;
+
+    $query = SEJOLI_REWARD\Model\Reward::reset()
+                ->set_filter_from_array($args)
+                ->set_data_start($table['start']);
+
+    if(isset($table['filter']['date-range']) && !empty($table['filter']['date-range'])) :
+        list($start, $end) = explode(' - ', $table['filter']['date-range']);
+        $query = $query->set_filter('created_at', $start.' 00:00:00', '>=')
+                    ->set_filter('created_at', $end.' 23:59:59', '<=');
+    endif;
+
+    if(0 < $table['length']) :
+        $query->set_data_length($table['length']);
+    endif;
+
+    if(!is_null($table['order']) && is_array($table['order'])) :
+        foreach($table['order'] as $order) :
+            $query->set_data_order($order['column'], $order['sort']);
+        endforeach;
+    endif;
+
+    $response = $query->get()->respond();
+
+    foreach($response['points'] as $i => $point) :
+        $response['points'][$i]->meta_data = maybe_unserialize($point->meta_data);
+    endforeach;
+
+    return wp_parse_args($response,[
+        'valid'    => false,
+        'points'   => NULL,
+        'messages' => []
+    ]);
+}

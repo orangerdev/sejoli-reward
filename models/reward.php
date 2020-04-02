@@ -288,6 +288,38 @@ Class Reward extends \SejoliSA\Model
     }
 
     /**
+     * Get points by filter
+     * @since   1.0.0
+     * @return  void
+     */
+    static function get() {
+
+        global $wpdb;
+
+        parent::$table = self::$table;
+
+        $query        = Capsule::table( self::table() );
+        $query        = self::set_filter_query( $query );
+        $recordsTotal = $query->count();
+        $query        = self::set_length_query($query);
+        $points       = $query->get()->toArray();
+
+        if ( $points ) :
+            self::set_respond('valid', true);
+            self::set_respond('points', $points);
+            self::set_respond('recordsTotal', $recordsTotal);
+            self::set_respond('recordsFiltered', $recordsTotal);
+        else:
+            self::set_respond('valid', false);
+            self::set_respond('points', []);
+            self::set_respond('recordsTotal', 0);
+            self::set_respond('recordsFiltered', 0);
+        endif;
+
+        return new static;
+    }
+
+    /**
      * Get available all user point
      * @since   1.0.0
      */

@@ -102,15 +102,18 @@ let sejoli_table;
                 },{
                     targets: 1,
                     width: '80px',
-                    data: 'added_point'
+                    data: 'added_point',
+                    className: 'center'
                 },{
                     targets: 2,
                     width: '80px',
-                    data : 'reduce_point'
+                    data : 'reduce_point',
+                    className: 'center'
                 },{
                     targets: 3,
                     width:  '80px',
-                    data: 'available_point'
+                    data: 'available_point',
+                    className: 'center'
                 }
             ],
             initComplete: function(settings, json) {

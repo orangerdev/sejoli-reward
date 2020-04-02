@@ -56,6 +56,12 @@ class Json extends \SejoliSA\JSON {
 
 	}
 
+    /**
+     * Set for table data via AJAX
+     * Hooked via action wp_ajax_sejoli-user-point-table, priority 1
+     * @since   1.0.0
+     * @return  array
+     */
     public function ajax_set_for_table() {
 
         $table  = $this->set_table_args($_POST);
@@ -86,6 +92,83 @@ class Json extends \SejoliSA\JSON {
                                                 'page'      => 'sejoli-reward-point',
                                                 'user_id'   => $_data->user_id
                                              ), admin_url('edit.php'))
+                    );
+
+                endforeach;
+
+                $total = count($data);
+
+            endif;
+
+        endif;
+
+        echo wp_send_json([
+            'table'           => $table,
+            'draw'            => $table['draw'],
+            'data'            => $data,
+            'recordsTotal'    => $total,
+            'recordsFiltered' => $total
+        ]);
+
+        exit;
+    }
+
+    /**
+     * Get point history for a user
+     * Hooked via filter wp_ajax_sejoli-single-user-point-table, priority 1
+     * @since   1.0.0
+     * @return  array
+     */
+    public function ajax_set_single_user_for_table() {
+
+        $table  = $this->set_table_args($_POST);
+        $params = wp_parse_args($_POST, array(
+            'nonce' 	=> NULL,
+			'user_id'   => NULL
+        ));
+
+        $total = 0;
+        $data  = [];
+
+        if(wp_verify_nonce($params['nonce'], 'sejoli-render-single-user-point-table')) :
+
+			$table['filter']['user_id']	= (empty($params['user_id'])) ? get_current_user_id() : intval($params['user_id']);
+
+    		$return = sejoli_reward_get_history($table['filter'], $table);
+
+            if(false !== $return['valid']) :
+
+                foreach($return['points'] as $_data) :
+
+					$detail = '';
+
+					if('in' === $_data->type) :
+
+						switch($_data->meta_data['type']) :
+
+							case 'order' :
+								$product = sejolisa_get_product($_data->product_id);
+								$detail = sprintf(__('Poin dari order %s untuk produk %s', 'sejoli-reward'), $_data->order_id, $product->post_title);
+								break;
+
+							case 'affiliate' :
+								$product = sejolisa_get_product($_data->product_id);
+								$detail = sprintf(__('Poin dari affiliasi order %s untuk produk %s, tier %s', 'sejoli-reward'), $_data->order_id, $product->post_title, $_data->meta_data['tier']);
+								break;
+
+						endswitch;
+
+					else :
+
+						$detail = $_data->meta_data['note'];
+
+					endif;
+
+                    $data[] = array(
+						'created_at' => date('Y/m/d', strtotime($_data->created_at)),
+						'detail'   	 => $detail,
+                        'point' 	 => $_data->point,
+                        'type'  	 => $_data->type
                     );
 
                 endforeach;

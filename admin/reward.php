@@ -489,9 +489,18 @@ class Reward {
 		$js_vars['user_point'] = array(
 			'table'	=> array(
 				'ajaxurl'	=> add_query_arg(array(
-					'action' => 'sejoli-user-point'
-				), admin_url('admin-ajax.php')),
+						'action' => 'sejoli-user-point-table'
+					), admin_url('admin-ajax.php')
+				),
 				'nonce'	=> wp_create_nonce('sejoli-render-user-point-table')
+			),
+			'single_table'	=> array(
+				'ajaxurl'	=> add_query_arg(array(
+						'action' => 'sejoli-single-user-point-table'
+					), admin_url('admin-ajax.php')
+				),
+				'nonce'   => wp_create_nonce('sejoli-render-single-user-point-table'),
+				'user_id' => (isset($_GET['user_id'])) ? intval($_GET['user_id']) : get_current_user_id()
 			)
 		);
 
@@ -504,7 +513,12 @@ class Reward {
 	 * @return 	void
 	 */
 	public function display_user_point() {
-		require_once( plugin_dir_path( __FILE__ ) . 'partials/user-point.php' );
+		if(isset($_GET['user_id'])) :
+			$user 	= sejolisa_get_user(intval($_GET['user_id']));
+			require_once( plugin_dir_path( __FILE__ ) . 'partials/single-user-point.php' );
+		else :
+			require_once( plugin_dir_path( __FILE__ ) . 'partials/user-point.php' );
+		endif;
 	}
 
 	/**
