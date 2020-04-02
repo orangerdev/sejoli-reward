@@ -198,7 +198,9 @@ class Sejoli_Reward {
 		$json  = new Sejoli_Reward\Admin\Json( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_ajax_sejoli-user-point-table',			$json, 'ajax_set_for_table', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-reward-table',				$json, 'ajax_set_reward_for_table', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-single-user-point-table',	$json, 'ajax_set_single_user_for_table', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-reward-options',				$json, 'ajax_get_reward_options', 1);
 
 		$order  = new Sejoli_Reward\Admin\Order( $this->get_plugin_name(), $this->get_version() );
 

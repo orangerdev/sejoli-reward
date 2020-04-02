@@ -298,7 +298,15 @@ Class Reward extends \SejoliSA\Model
 
         parent::$table = self::$table;
 
-        $query        = Capsule::table( self::table() );
+        $query        = Capsule::table( Capsule::raw( self::table() . ' AS reward' ))
+                        ->select(
+                            'reward.*',
+                            'user.display_name',
+                            'user.user_email'
+                        )
+                        ->join(
+                            $wpdb->users . ' AS user', 'user.ID', '=', 'reward.user_id'
+                        );
         $query        = self::set_filter_query( $query );
         $recordsTotal = $query->count();
         $query        = self::set_length_query($query);

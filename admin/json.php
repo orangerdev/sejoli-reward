@@ -189,4 +189,102 @@ class Json extends \SejoliSA\JSON {
 
         exit;
     }
+
+	/**
+     * Get reward exchange data
+     * Hooked via filter wp_ajax_sejoli-reward-table, priority 1
+     * @since   1.0.0
+     * @return  array
+     */
+    public function ajax_set_reward_for_table() {
+
+        $table  = $this->set_table_args($_POST);
+        $params = wp_parse_args($_POST, array(
+            'nonce' 	=> NULL
+        ));
+
+        $total = 0;
+        $data  = [];
+
+        if(wp_verify_nonce($params['nonce'], 'sejoli-render-reward-table')) :
+
+			$table['filter']['type']        = 'out';
+			$table['filter']['valid_point'] = NULL;
+
+    		$return = sejoli_reward_get_history($table['filter'], $table);
+
+            if(false !== $return['valid']) :
+
+                foreach($return['points'] as $_data) :
+
+                    $data[] = array(
+						'user_id'         => $_data->user_id,
+                        'display_name'    => $_data->display_name,
+                        'user_email'      => $_data->user_email,
+						'created_at' => date('Y/m/d', strtotime($_data->created_at)),
+						'detail'   	 => $_data->meta_data['note'],
+                        'point' 	 => $_data->point,
+                    );
+
+                endforeach;
+
+                $total = count($data);
+
+            endif;
+
+        endif;
+
+        echo wp_send_json([
+            'table'           => $table,
+            'draw'            => $table['draw'],
+            'data'            => $data,
+            'recordsTotal'    => $total,
+            'recordsFiltered' => $total
+        ]);
+
+        exit;
+    }
+
+	/**
+     * Ger reward options
+     * Hooked via action wp_ajax_sejoli-reward-options, priority 1
+     * @since   1.0.0
+     * @return  json
+     */
+    public function ajax_get_reward_options() {
+
+        global $post;
+
+        $options = [];
+        $args    = wp_parse_args($_GET,[
+            'term'    => ''
+        ]);
+
+        $rewards = new \WP_Query([
+            's'              => $args['term'],
+            'post_type'      => SEJOLI_REWARD_CPT,
+            'posts_per_page' => 80
+        ]);
+
+        if($rewards->have_posts()) :
+            while($rewards->have_posts()) :
+
+                $rewards->the_post();
+
+
+                $options[] = [
+                    'id'   => get_the_ID(),
+                    'text' => get_the_title()
+                ];
+            endwhile;
+        endif;
+
+        wp_reset_query();
+
+        wp_send_json([
+            'results' => $options
+        ]);
+
+        exit;
+    }
 }

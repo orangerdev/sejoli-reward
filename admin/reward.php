@@ -501,6 +501,21 @@ class Reward {
 				),
 				'nonce'   => wp_create_nonce('sejoli-render-single-user-point-table'),
 				'user_id' => (isset($_GET['user_id'])) ? intval($_GET['user_id']) : get_current_user_id()
+			),
+			'reward_table'	=> array(
+				'ajaxurl'	=> add_query_arg(array(
+						'action' => 'sejoli-reward-table'
+					), admin_url('admin-ajax.php')
+				),
+				'nonce'	=> wp_create_nonce('sejoli-render-reward-table')				
+			),
+			'reward'		=> array(
+				'placeholder'	=> __('Pilih reward', 'sejoli-reward'),
+				'ajaxurl'		=> add_query_arg(array(
+									'action'	=> 'sejoli-reward-options',
+									'nonce'		=> wp_create_nonce('sejoli-render-reward-options')
+								), admin_url('admin-ajax.php')
+						)
 			)
 		);
 

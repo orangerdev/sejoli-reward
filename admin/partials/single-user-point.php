@@ -1,5 +1,5 @@
 <?php
-    $date = date('Y-m-d', strtotime('-365day')) . ' - ' . date('Y-m-d');
+    $date = date('Y-m-d', strtotime('-30day')) . ' - ' . date('Y-m-d');
 ?>
 <div class="wrap">
     <h1 class="wp-heading-inline">
