@@ -252,7 +252,8 @@ class Sejoli_Reward {
 
 		$this->loader->add_filter( 'sejoli/member-area/menu',			$member, 'register_menu', 12);
 		$this->loader->add_filter( 'sejoli/member-area/backend/menu',	$member, 'add_menu_in_backend', 1222);
-		$this->loader->add_filter( 'sejoli/member-area/menu-link',		$member, 'display_link_list_in_menu', 1, 4);
+		$this->loader->add_filter( 'sejoli/member-area/menu-link',		$member, 'display_link_list_in_menu', 12, 4);
+		$this->loader->add_filter( 'sejoli/template-file',				$member, 'set_template_file', 122, 2);
 
 	}
 

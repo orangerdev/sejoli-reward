@@ -157,4 +157,26 @@ class Member {
 
         return $output;
     }
+
+    /**
+     * Set template file for point menu template
+     * Hooked via sejoli/template-file, priority 122
+     * @since   1.0.0
+     * @param   string  $file
+     * @param   string  $view_request
+     */
+    public function set_template_file(string $file, string $view_request) {
+
+        if('your-point' === $view_request) :
+
+            return SEJOLI_REWARD_DIR . 'template/your-point.php';
+
+        elseif('reward-exchange' === $view_request) :
+
+            return SEJOLI_REWARD_DIR . 'template/reward-exchange.php';
+
+        endif;
+
+        return $file;
+    }
 }
