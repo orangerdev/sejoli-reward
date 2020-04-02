@@ -116,6 +116,34 @@ class Reward {
     	register_post_type( SEJOLI_REWARD_CPT, $args );
     }
 
+	/**
+	 * Add new submenu under Reward menu
+	 * Hooked via action admin_menu, priority 122
+	 * @since 	1.0.0
+	 * @return	void
+	 */
+	public function add_custom_point_menu() {
+
+		add_submenu_page(
+			'edit.php?post_type=' .  SEJOLI_REWARD_CPT,
+			__('Sejoli - Poin User', 'sejoli'),
+			__('Poin User', 'sejoli'),
+			'manage_sejoli_sejoli',
+			'sejoli-reward-point',
+			array($this, 'display_user_point')
+		);
+
+		add_submenu_page(
+			'edit.php?post_type=' .  SEJOLI_REWARD_CPT,
+			__('Sejoli - Tukar Poin', 'sejoli'),
+			__('Tukar Poin', 'sejoli'),
+			'manage_sejoli_sejoli',
+			'sejoli-reward-exchange',
+			array($this, 'display_reward_exchange')
+		);
+
+	}
+
     /**
      * Setup reward post meta fields
      * Hooked via carbon_fields_register_fields, priority 1222
@@ -396,7 +424,7 @@ class Reward {
 	 * @since 	1.0.0
 	 * @param 	array $fields
 	 */
-	public function set_noficication_fields(array $fields) {
+	public function set_notification_fields(array $fields) {
 
 		$fields['point'] = [
 			'title'		=> __('Informasi Poin', 'sejoli'),
@@ -426,5 +454,65 @@ class Reward {
 		];
 
 		return $fields;
+	}
+
+	/**
+	 * Check if current admin page is a sejoli page
+	 * Hooked via filter sejoli/admin/is-sejoli-page, priority 1222
+	 * @param  boolean $is_sejoli_page
+	 * @return boolean
+	 */
+	public function is_current_page_sejoli_page($is_sejoli_page) {
+
+		global $pagenow;
+
+		if(
+			'edit.php' === $pagenow &&
+			isset($_GET['post_type']) && SEJOLI_REWARD_CPT === $_GET['post_type'] &&
+			isset($_GET['page']) && in_array($_GET['page'], array('sejoli-reward-exchange', 'sejoli-reward-point'))
+		) :
+			return true;
+		endif;
+
+		return $is_sejoli_page;
+	}
+
+	/**
+	 * Set local JS variables
+	 * Hooked via filter sejoli/admin/js-localize-data, priority 12
+	 * @since 	1.0.0
+	 * @param 	array $js_vars
+	 * @return 	array
+	 */
+	public function set_localize_js_vars($js_vars) {
+
+		$js_vars['user_point'] = array(
+			'table'	=> array(
+				'ajaxurl'	=> add_query_arg(array(
+					'action' => 'sejoli-user-point'
+				), admin_url('admin-ajax.php')),
+				'nonce'	=> wp_create_nonce('sejoli-render-user-point-table')
+			)
+		);
+
+		return $js_vars;
+	}
+
+	/**
+	 * Display all user point
+	 * @since 	1.0.0
+	 * @return 	void
+	 */
+	public function display_user_point() {
+		require_once( plugin_dir_path( __FILE__ ) . 'partials/user-point.php' );
+	}
+
+	/**
+	 * Display all reward exchange
+	 * @since 	1.0.0
+	 * @return 	void
+	 */
+	public function display_reward_exchange() {
+		require_once( plugin_dir_path( __FILE__ ) . 'partials/reward-exchange.php' );
 	}
 }

@@ -316,6 +316,7 @@ Class Reward extends \SejoliSA\Model
                         $wpdb->users . ' AS user', 'user.ID', '=', 'reward.user_id'
                     )
                     ->where('valid_point', true)
+                    ->orderBy('available_point', 'DESC')
                     ->groupBy('user_id');
         $result = $query->get();
 

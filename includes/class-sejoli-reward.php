@@ -130,6 +130,7 @@ class Sejoli_Reward {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once SEJOLI_REWARD_DIR . 'admin/admin.php';
+		require_once SEJOLI_REWARD_DIR . 'admin/json.php';
 		require_once SEJOLI_REWARD_DIR . 'admin/order.php';
 		require_once SEJOLI_REWARD_DIR . 'admin/reward.php';
 
@@ -191,7 +192,12 @@ class Sejoli_Reward {
 	private function define_admin_hooks() {
 
 		$admin = new Sejoli_Reward\Admin( $this->get_plugin_name(), $this->get_version() );
+
 		$this->loader->add_action( 'sejoli/database/setup',			$admin, 'register_database', 1);
+
+		$json  = new Sejoli_Reward\Admin\Json( $this->get_plugin_name(), $this->get_version() );
+		
+		$this->loader->add_action( 'wp_ajax_sejoli-user-point-table',	$json, 'ajax_set_for_table');
 
 		$order  = new Sejoli_Reward\Admin\Order( $this->get_plugin_name(), $this->get_version() );
 
@@ -211,9 +217,12 @@ class Sejoli_Reward {
 		$this->loader->add_action( 'carbon_fields_register_fields',	$reward, 'setup_reward_fields', 1222);
 		$this->loader->add_filter( 'manage_posts_columns',			$reward, 'modify_post_columns',	1222, 2);
 		$this->loader->add_action( 'manage_posts_custom_column',	$reward, 'display_data_in_post_columns', 1222, 2);
-		$this->loader->add_filter( 'sejoli/product/meta-data',		$reward, 'set_product_point',			122);
+		$this->loader->add_filter( 'sejoli/product/meta-data',		$reward, 'set_product_point',		122);
+		$this->loader->add_action( 'admin_menu',					$reward, 'add_custom_point_menu', 	122);
+		$this->loader->add_filter( 'sejoli/admin/js-localize-data', $reward, 'set_localize_js_vars',	12);
+		$this->loader->add_filter( 'sejoli/admin/is-sejoli-page',	$reward, 'is_current_page_sejoli_page', 1222);
 
-		$this->loader->add_filter( 'sejoli/notification/fields',    		$reward, 'set_noficication_fields', 120);
+		$this->loader->add_filter( 'sejoli/notification/fields',    		$reward, 'set_notification_fields', 120);
 		$this->loader->add_filter( 'sejoli/product/fields',					$reward, 'set_product_fields',		12);
 		$this->loader->add_filter( 'sejoli/user-group/fields',				$reward, 'set_user_group_fields', 	12);
 		$this->loader->add_filter( 'sejoli/user-group/per-product/fields',	$reward, 'set_user_group_per_product_fields', 12, 2);
