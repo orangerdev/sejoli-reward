@@ -138,6 +138,7 @@ class Sejoli_Reward {
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
+		require_once SEJOLI_REWARD_DIR . 'public/member.php';
 		require_once SEJOLI_REWARD_DIR . 'public/public.php';
 
 		/**
@@ -246,6 +247,12 @@ class Sejoli_Reward {
 	private function define_public_hooks() {
 
 		$public = new Sejoli_Reward\Front( $this->get_plugin_name(), $this->get_version() );
+
+		$member = new Sejoli_Reward\Front\Member( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_filter( 'sejoli/member-area/menu',			$member, 'register_menu', 12);
+		$this->loader->add_filter( 'sejoli/member-area/backend/menu',	$member, 'add_menu_in_backend', 1222);
+		$this->loader->add_filter( 'sejoli/member-area/menu-link',		$member, 'display_link_list_in_menu', 1, 4);
 
 	}
 
