@@ -126,13 +126,13 @@ let sejoli_table;
                 },{
                     targets: 4,
                     width:  '80px',
-                    data: 'type',
+                    data: 'valid',
                     className: 'center',
-                    render: function(data) {
-                        if('in' === data) {
-                            return '<label class="ui green label">Tambah</label>';
+                    render: function(data, type, full) {
+                        if(1 == data) {
+                            return '<a class="button update-valid-point" href="' + full.update_valid + '"><?php _e('Batalkan', 'sejoli-reward'); ?></a>';
                         } else {
-                            return '<label class="ui yellow label">Kurang</label>';
+                            return '<a class="button update-valid-point" href="' + full.update_valid + '"><?php _e('Setujui', 'sejoli-reward'); ?></a>';
                         }
                     }
                 }
@@ -156,6 +156,23 @@ let sejoli_table;
             sejoli_table.ajax.reload();
             $('.sejoli-form-filter-holder').hide();
         });
+
+        $('body').on('click', '.update-valid-point', function(e){
+
+            let ajaxurl = $(this).attr('href');
+
+            $.ajax({
+                url : ajaxurl,
+                beforeSend: function() {
+                    sejoli.helper.blockUI('.sejoli-table-holder');
+                },
+                success: function() {
+                    sejoli.helper.unblockUI('.sejoli-table-holder');
+                    sejoli_table.ajax.reload();
+                }
+            })
+            return false;
+        })
 
     });
 })(jQuery);

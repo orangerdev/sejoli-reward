@@ -319,3 +319,19 @@ function sejoli_reward_get_history(array $args, $table = array()) {
         'messages' => []
     ]);
 }
+
+/**
+ * Update single reward exchange point validity
+ * @since   1.0.0
+ * @param   integer  $id
+ * @param   boolean  $valid
+ * @return  void
+ */
+function sejoli_update_exchange_point_validity($id, $valid = false) {
+
+    $response   = \SEJOLI_REWARD\Model\Reward::reset()
+                        ->set_id($id)
+                        ->set_valid_point($valid)
+                        ->update_exchange_valid_point()
+                        ->respond();
+}

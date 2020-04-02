@@ -155,6 +155,15 @@ Class Reward extends \SejoliSA\Model
             endif;
 
         endif;
+
+        if(in_array(self::$action, array('update-exhcange-valid-point', 'get-single'))) :
+
+            if(empty(self::$id)) :
+                self::set_valid(false);
+                self::set_message( __('ID tidak boleh kosong', 'sejoli-reward'));
+            endif;
+
+        endif;
     }
 
     /**
@@ -292,7 +301,7 @@ Class Reward extends \SejoliSA\Model
      * @since   1.0.0
      * @return  void
      */
-    static function get() {
+    static public function get() {
 
         global $wpdb;
 
@@ -473,6 +482,33 @@ Class Reward extends \SejoliSA\Model
 
             Capsule::table(self::table())
                             ->where('order_id', self::$order_id)
+                            ->update(array(
+                                'valid_point'   => self::$valid_point
+                            ));
+
+            self::set_valid(true);
+
+        endif;
+
+        return new static;
+    }
+
+    /**
+     * Update exchange valid point
+     * @since
+     */
+    static public function update_exchange_valid_point() {
+
+        self::set_action('update-exchange-valid-point');
+        self::validate();
+
+        if(false !== self::$valid) :
+
+            parent::$table = self::$table;
+
+            Capsule::table(self::table())
+                            ->where('ID', self::$id)
+                            ->where('type', 'out')
                             ->update(array(
                                 'valid_point'   => self::$valid_point
                             ));

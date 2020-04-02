@@ -218,12 +218,19 @@ class Json extends \SejoliSA\JSON {
                 foreach($return['points'] as $_data) :
 
                     $data[] = array(
-						'user_id'         => $_data->user_id,
-                        'display_name'    => $_data->display_name,
-                        'user_email'      => $_data->user_email,
-						'created_at' => date('Y/m/d', strtotime($_data->created_at)),
-						'detail'   	 => $_data->meta_data['note'],
-                        'point' 	 => $_data->point,
+						'user_id'       => $_data->user_id,
+                        'display_name'  => $_data->display_name,
+                        'user_email'    => $_data->user_email,
+						'created_at' 	=> date('Y/m/d', strtotime($_data->created_at)),
+						'detail'   	 	=> $_data->meta_data['note'],
+                        'point' 	 	=> $_data->point,
+						'valid'			=> boolval($_data->valid_point),
+						'update_valid'	=> add_query_arg(array(
+												'ID'          => $_data->ID,
+												'valid_point' => !(boolval($_data->valid_point)),
+												'action'      => 'sejoli-update-reward-point-status',
+												'nonce'       => wp_create_nonce('sejoli-update-reward-point-status')
+										   ), admin_url('admin-ajax.php'))
                     );
 
                 endforeach;
@@ -287,4 +294,25 @@ class Json extends \SejoliSA\JSON {
 
         exit;
     }
+
+	/**
+	 * Update reward point status
+	 * Hooked via action wp_ajax_sejoli-update-reward-point-status, priority
+	 * @return 	void
+	 */
+	public function ajax_update_reward_point_status() {
+
+		$params 	= wp_parse_args($_GET, array(
+			'nonce'       => false,
+			'ID'          => NULL,
+			'valid_point' => false,
+		));
+
+		if(wp_verify_nonce($params['nonce'], 'sejoli-update-reward-point-status')):
+			sejoli_update_exchange_point_validity($params['ID'], $params['valid_point']);
+		endif;
+
+		echo wp_send_json(array());
+		exit;
+	}
 }
