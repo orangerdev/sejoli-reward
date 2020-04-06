@@ -195,6 +195,7 @@ class Sejoli_Reward {
 		$admin = new Sejoli_Reward\Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'sejoli/database/setup',			$admin, 'register_database', 1);
+		$this->loader->add_action( 'admin_bar_menu',				$admin, 'add_point_link',	 12222);
 
 		$json  = new Sejoli_Reward\Admin\Json( $this->get_plugin_name(), $this->get_version() );
 

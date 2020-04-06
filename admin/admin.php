@@ -78,4 +78,38 @@ class Admin {
 
 	}
 
+	/**
+	 * Add point menu in admin bar
+	 * Hooked via action admin_bar_menu, priority 12
+	 * @since 	1.0.0
+	 * @param 	stdClass 	$admin_bar
+	 */
+	public function add_point_link($admin_bar) {
+
+		$point = 0;
+		$point_response = sejoli_reward_get_user_point();
+
+		if(false !== $point_response['valid']) :
+			$point = absint($point_response['point']->valid_point);
+		endif;
+
+		$admin_bar->add_menu(array(
+			'id'	=> 'sejoli-point',
+			'title'	=> sprintf(__('Poin anda : %s', 'sejoli'), $point),
+			'href'	=> site_url('member-area/your-point')
+		));
+
+		$admin_bar->add_menu(array(
+			'parent'	=> 'sejoli-point',
+			'title'		=> __('Transaksi Poin', 'sejoli'),
+			'href'		=> site_url('member-area/your-point')
+		));
+
+		$admin_bar->add_menu(array(
+			'parent'	=> 'sejoli-point',
+			'title'		=> __('Tukar Poin', 'sejoli'),
+			'href'		=> site_url('member-area/reward-exchange')
+		));
+	}
+
 }
