@@ -1,4 +1,39 @@
-/**
- * All of the CSS for your public-facing functionality should be
- * included in this file.
- */
+.dataTable th.price,
+.dataTable td.price {
+    text-align: right;
+}
+
+.dataTable th.center,
+.dataTable td.center {
+    text-align: center;
+}
+
+.reward-detail {
+    display: flex;
+    justify-content: space-between;
+}
+
+.reward-detail > figure {
+    width: 150px;
+    margin: 0;
+}
+
+.reward-detail > figure img {
+
+}
+
+.reward-content {
+    width: calc(100% - 160px);
+}
+
+.reward-content .reward-title {
+
+}
+
+.reward-content .reward-description {
+
+}
+
+@media screen and ( max-width: 480px ) {
+
+}

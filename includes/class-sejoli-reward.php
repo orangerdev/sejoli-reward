@@ -202,6 +202,9 @@ class Sejoli_Reward {
 		$this->loader->add_action( 'wp_ajax_sejoli-user-point-table',			$json, 'ajax_set_for_table', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-reward-table',				$json, 'ajax_set_reward_for_table', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-single-user-point-table',	$json, 'ajax_set_single_user_for_table', 1);
+		$this->loader->add_action( 'sejoli_ajax_single-user-point-table',		$json, 'ajax_set_single_user_for_table', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-available-reward-table',		$json, 'ajax_get_available_reward_for_table', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-reward-exchange',			$json, 'ajax_set_reward_exchange', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-reward-options',				$json, 'ajax_get_reward_options', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-update-reward-point-status', $json, 'ajax_update_reward_point_status', 1);
 
@@ -248,6 +251,8 @@ class Sejoli_Reward {
 	private function define_public_hooks() {
 
 		$public = new Sejoli_Reward\Front( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'wp_enqueue_scripts',	$public, 'enqueue_styles', 1222);
 
 		$member = new Sejoli_Reward\Front\Member( $this->get_plugin_name(), $this->get_version() );
 

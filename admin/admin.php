@@ -86,12 +86,17 @@ class Admin {
 	 */
 	public function add_point_link($admin_bar) {
 
+		if(is_admin()) :
+			return;
+		endif;
+
 		$point = 0;
 		$point_response = sejoli_reward_get_user_point();
 
 		if(false !== $point_response['valid']) :
-			$point = absint($point_response['point']->valid_point);
+			$point = absint($point_response['point']->available_point);
 		endif;
+
 
 		$admin_bar->add_menu(array(
 			'id'	=> 'sejoli-point',
@@ -100,12 +105,14 @@ class Admin {
 		));
 
 		$admin_bar->add_menu(array(
+			'id'		=> 'sejoli-point-history',
 			'parent'	=> 'sejoli-point',
 			'title'		=> __('Transaksi Poin', 'sejoli'),
 			'href'		=> site_url('member-area/your-point')
 		));
 
 		$admin_bar->add_menu(array(
+			'id'		=> 'sejoli-point-reward',
 			'parent'	=> 'sejoli-point',
 			'title'		=> __('Tukar Poin', 'sejoli'),
 			'href'		=> site_url('member-area/reward-exchange')

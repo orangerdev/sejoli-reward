@@ -315,4 +315,94 @@ class Json extends \SejoliSA\JSON {
 		echo wp_send_json(array());
 		exit;
 	}
+
+	/**
+	 * Get available reward for table display
+	 * @since 	1.0.0
+	 * @return 	array
+	 */
+	public function ajax_get_available_reward_for_table() {
+
+		$total  = 0;
+		$table  = $this->set_table_args($_POST);
+        $params = wp_parse_args($_POST, array(
+            'nonce' 	=> NULL
+        ));
+
+        if(wp_verify_nonce($params['nonce'], 'sejoli-render-reward-table')) :
+
+			$rewards = new \WP_Query([
+	            'post_type'      => SEJOLI_REWARD_CPT,
+	            'posts_per_page' => -1,
+				'post_status'	 => 'publish'
+	        ]);
+
+	        if($rewards->have_posts()) :
+
+				while($rewards->have_posts()) :
+
+	                $rewards->the_post();
+
+	                $data[] = [
+	                    'id'   		=> get_the_ID(),
+						'image'     => get_the_post_thumbnail_url(get_the_ID(), 'thumbnail'),
+	                    'title' 	=> get_the_title(),
+						'content'   => get_the_content(),
+						'point'     => carbon_get_the_post_meta('reward_point')
+	                ];
+
+	            endwhile;
+
+				$total = $rewards->post_count;
+
+	        endif;
+
+	        wp_reset_query();
+
+		endif;
+
+		echo wp_send_json([
+			'table'           => $table,
+			'draw'            => $table['draw'],
+			'data'            => $data,
+			'recordsTotal'    => $total,
+			'recordsFiltered' => $total
+		]);
+
+		exit;
+	}
+
+	/**
+	 * Do exchange reward
+	 * Hooked via action wp_ajax_sejoli-reward-exchange, priority 1
+	 * @since 	1.0.0
+	 * @return 	array
+	 */
+	public function ajax_set_reward_exchange() {
+
+		$response = array(
+			'valid'   => false,
+			'message' => __('Terjadi kesalahan di sistem', 'sejoli')
+		);
+
+		$params = wp_parse_args($_POST, array(
+						'nonce'     => NULL,
+						'reward_id' => NULL
+					));
+
+		if(
+			wp_verify_nonce($params['nonce'], 'sejoli-reward-exchange') &&
+			!empty($params['reward_id'])
+		) :
+
+			$exchange_response   = sejoli_exchange_reward($params['reward_id']);
+			$response['valid']   = $exchange_response['valid'];
+			$response['message'] = implode('. ', $exchange_response['messages']);
+
+		endif;
+
+
+		echo wp_send_json($response);
+		exit;
+	}
 }

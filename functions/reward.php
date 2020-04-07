@@ -177,7 +177,7 @@ function sejoli_exchange_reward($reward_id, $user_id = 0) {
                                         'reward_id' => $reward_id,
                                         'meta_data' => array(
                                             'note'  => sprintf(
-                                                            __('Penukaran poin dengan reward berupa', 'sejoli'),
+                                                            __('Penukaran poin dengan reward berupa %s', 'sejoli'),
                                                             $reward->post_title
                                         ))
                                     ));

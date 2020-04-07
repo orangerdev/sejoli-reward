@@ -75,8 +75,8 @@ let sejoli_table;
                 type: 'POST',
                 url: sejoli_admin.user_point.single_table.ajaxurl,
                 data: function(data) {
-                    data.filter = sejoli.var.search;
-                    data.action = 'sejoli-single-user-point-table';
+
+                    data.__sejoli_ajax = 'single-user-point-table';
                     data.nonce = sejoli_admin.user_point.single_table.nonce;
                     data.user_id = sejoli_admin.user_point.single_table.user_id;
                     data.backend  = true;
