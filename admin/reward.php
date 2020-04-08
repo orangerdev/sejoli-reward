@@ -420,7 +420,7 @@ class Reward {
 
 	/**
 	 * Add notification setting fields
-	 * Hooke via filter sejoli/notification/fields, priority 122
+	 * Hooke via filter sejoli/notification/fields, priority 124
 	 * @since 	1.0.0
 	 * @param 	array $fields
 	 */
@@ -507,7 +507,7 @@ class Reward {
 						'action' => 'sejoli-reward-table'
 					), admin_url('admin-ajax.php')
 				),
-				'nonce'	=> wp_create_nonce('sejoli-render-reward-table')				
+				'nonce'	=> wp_create_nonce('sejoli-render-reward-table')
 			),
 			'reward'		=> array(
 				'placeholder'	=> __('Pilih reward', 'sejoli-reward'),

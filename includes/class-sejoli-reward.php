@@ -131,6 +131,7 @@ class Sejoli_Reward {
 		 */
 		require_once SEJOLI_REWARD_DIR . 'admin/admin.php';
 		require_once SEJOLI_REWARD_DIR . 'admin/json.php';
+		require_once SEJOLI_REWARD_DIR . 'admin/notification.php';
 		require_once SEJOLI_REWARD_DIR . 'admin/order.php';
 		require_once SEJOLI_REWARD_DIR . 'admin/reward.php';
 
@@ -207,6 +208,15 @@ class Sejoli_Reward {
 		$this->loader->add_action( 'wp_ajax_sejoli-reward-exchange',			$json, 'ajax_set_reward_exchange', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-reward-options',				$json, 'ajax_get_reward_options', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-update-reward-point-status', $json, 'ajax_update_reward_point_status', 1);
+
+		$notification  = new Sejoli_Reward\Admin\Notification( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_filter( 'sejoli/email/template-directory',		$notification, 'set_notification_directory', 12, 4);
+		$this->loader->add_filter( 'sejoli/sms/template-directory',			$notification, 'set_notification_directory', 12, 4);
+		$this->loader->add_filter( 'sejoli/whatsapp/template-directory',	$notification, 'set_notification_directory', 12, 4);
+		
+		$this->loader->add_filter( 'sejoli/notification/libraries',			$notification, 'add_libraries', 12);
+
 
 		$order  = new Sejoli_Reward\Admin\Order( $this->get_plugin_name(), $this->get_version() );
 
