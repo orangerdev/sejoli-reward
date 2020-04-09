@@ -217,6 +217,7 @@ class Sejoli_Reward {
 
 		$this->loader->add_filter( 'sejoli/notification/libraries',			$notification, 'add_libraries', 12);
 		$this->loader->add_action( 'sejoli/notification/reward/exchange',	$notification, 'send_reward_exchange_notification', 12);
+		$this->loader->add_action( 'sejoli/notification/reward/cancel',		$notification, 'send_reward_cancel_notification', 12);
 
 
 		$order  = new Sejoli_Reward\Admin\Order( $this->get_plugin_name(), $this->get_version() );

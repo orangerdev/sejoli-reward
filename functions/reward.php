@@ -337,6 +337,20 @@ function sejoli_update_exchange_point_validity($id, $valid = false) {
                         ->set_valid_point($valid)
                         ->update_exchange_valid_point()
                         ->respond();
+
+    $point_response = sejoli_get_single_point_detail($id);
+
+    if(false !== $point_response['valid']) :
+
+        if(false === $valid) :
+            do_action('sejoli/notification/reward/cancel', $point_response['point']);
+        else :
+            do_action('sejoli/notification/reward/exchange', $point_response['point']);
+        endif;
+
+    endif;
+
+    return $response;
 }
 
 /**

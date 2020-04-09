@@ -83,7 +83,7 @@ class Notification {
 			$request_id = intval($_GET['dylan']);
 			$response = sejoli_get_single_point_detail($request_id);
 
-			do_action('sejoli/notification/reward/exchange', $response['point']);
+			do_action('sejoli/notification/reward/cancel', $response['point']);
 			exit;
 		endif;
 	}
@@ -132,7 +132,7 @@ class Notification {
 
 	/**
 	 * Send reward exchange notification
-	 * Hooked via action sejoli/notification/reward/exchange, priority 1
+	 * Hooked via action sejoli/notification/reward/exchange, priority 12
 	 * @since 	1.0.0
 	 * @param  	array $point_data
 	 * @return 	void
@@ -145,6 +145,30 @@ class Notification {
 		$point_data['reward-name'] = $reward->post_title;
 
 		$this->libraries['reward-exchange']->trigger(
+			(array) $point_data,
+			array(
+				'user_name'  => $user->display_name,
+				'user_email' => $user->user_email,
+				'user_phone' => $user->meta->user_phone
+			));
+
+	}
+
+	/**
+	 * Send cancel reward exchange notification
+	 * Hooked via action sejoli/notification/reward/cancel, priority 12
+	 * @since 	1.0.0
+	 * @param  	array $point_data
+	 * @return 	void
+	 */
+	public function send_reward_cancel_notification($point_data) {
+
+		$point_data                = (array) $point_data;
+		$reward                    = get_post($point_data['reward_id']);
+		$user                      = sejolisa_get_user($point_data['user_id']);
+		$point_data['reward-name'] = $reward->post_title;
+
+		$this->libraries['reward-cancel']->trigger(
 			(array) $point_data,
 			array(
 				'user_name'  => $user->display_name,

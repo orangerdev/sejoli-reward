@@ -21,6 +21,12 @@ class RewardCancel extends \SejoliSA\Notification\Main {
     protected $user_data;
 
     /**
+     * Set point data
+     * @var array
+     */
+    protected $point_data;
+
+    /**
      * Attachment for file
      * @since   1.0.0
      * @var     bool|array
@@ -54,7 +60,7 @@ class RewardCancel extends \SejoliSA\Notification\Main {
 
 				Field::make('text', 	'cancel_exchange_email_title',	 __('Judul' ,'sejoli'))
 					->set_required(true)
-					->set_default_value(__('{{user-name}}, anda telah menukar poin dengan {{reward-name}}', 'sejoli')),
+					->set_default_value(__('{{user-name}}, penukaran {{reward-name}} telah dibatalkan', 'sejoli')),
 
 				Field::make('rich_text', 'cancel_exchange_email_content', __('Konten', 'sejoli'))
 					->set_required(true)
@@ -99,7 +105,7 @@ class RewardCancel extends \SejoliSA\Notification\Main {
 
 				Field::make('text', 		'cancel_exchange_admin_email_title',	 __('Judul' ,'sejoli'))
 					->set_required(true)
-					->set_default_value(__('{{user-name}} telah menukar poin dengan {{reward-name}}', 'sejoli'))
+					->set_default_value(__('Penukaran poin {{reward-name}} untuk {{user-name}} telah dibatalkan', 'sejoli'))
 					->set_conditional_logic([
 						[
 							'field'	=> 'cancel_exchange_admin_active',
@@ -273,13 +279,11 @@ class RewardCancel extends \SejoliSA\Notification\Main {
      */
     public function add_shortcode_detail(array $shortcodes) {
 
-        $shortcodes['{{memberurl}}']  = home_url('/member-area/');
-        $shortcodes['{{sitename}}']   = get_bloginfo('name');
-        $shortcodes['{{siteurl}}']    = home_url('/');
-        $shortcodes['{{user-name}}']  = $this->user_data['user_name'];
-        $shortcodes['{{user-email}}'] = $this->user_data['user_email'];
-        $shortcodes['{{user-pass}}']  = $this->user_data['user_password'];
-        $shortcodes['{{user-phone}}'] = $this->user_data['user_phone'];
+        $shortcodes['{{site-url}}']       = home_url('/');
+        $shortcodes['{{user-name}}']      = $this->user_data['user_name'];
+        $shortcodes['{{buyer-name}}']     = $this->user_data['user_name'];
+        $shortcodes['{{reward-name}}']    = $this->point_data['reward-name'];
+        $shortcodes['{{point-exchange}}'] = $this->point_data['point'];
 
         return $shortcodes;
     }
@@ -287,13 +291,15 @@ class RewardCancel extends \SejoliSA\Notification\Main {
     /**
      * Trigger to send notification
      * @since   1.0.0
-     * @param   array  $order_data   Order data
+     * @param   array   $point_data   Point data
+     * @param   array   $user_data
      * @return  void
      */
-    public function trigger(array $user_data) {
+    public function trigger($point_data, $user_data) {
 
-        $this->user_data = $user_data;
-        $media_libraries = $this->get_media_libraries();
+        $this->point_data = $point_data;
+        $this->user_data  = $user_data;
+        $media_libraries  = $this->get_media_libraries();
 
         $this->shortcode_data = $this->add_shortcode_detail([]);
         $this->set_content();
@@ -347,10 +353,7 @@ class RewardCancel extends \SejoliSA\Notification\Main {
         // send whatsapp for buyer
         if(false !== $this->is_able_to_send('whatsapp', 'buyer')) :
     		$media_libraries['whatsapp']->set_data([
-    			'order_data'     => $this->order_data,
-    			'product_data'   => $this->product_data,
-    			'buyer_data'     => $this->buyer_data,
-    			'affiliate_data' => $this->affiliate_data,
+                'user_data' => $user_data
     		]);
 
             $media_libraries['whatsapp']->send(
@@ -381,10 +384,7 @@ class RewardCancel extends \SejoliSA\Notification\Main {
         // send sms for buyer
         if(false !== $this->is_able_to_send('sms', 'buyer')) :
     		$media_libraries['sms']->set_data([
-    			'order_data'     => $this->order_data,
-    			'product_data'   => $this->product_data,
-    			'buyer_data'     => $this->buyer_data,
-    			'affiliate_data' => $this->affiliate_data,
+                'user_data' => $user_data
     		]);
 
             $media_libraries['sms']->send(

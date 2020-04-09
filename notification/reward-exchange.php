@@ -291,7 +291,8 @@ class RewardExchange extends \SejoliSA\Notification\Main {
     /**
      * Trigger to send notification
      * @since   1.0.0
-     * @param   array  $order_data   Order data
+     * @param   array   $point_data   Point data
+     * @param   array   $user_data
      * @return  void
      */
     public function trigger($point_data, $user_data) {
@@ -352,10 +353,7 @@ class RewardExchange extends \SejoliSA\Notification\Main {
         // send whatsapp for buyer
         if(false !== $this->is_able_to_send('whatsapp', 'buyer')) :
     		$media_libraries['whatsapp']->set_data([
-    			'order_data'     => $this->order_data,
-    			'product_data'   => $this->product_data,
-    			'buyer_data'     => $this->buyer_data,
-    			'affiliate_data' => $this->affiliate_data,
+                'user_data' => $user_data,
     		]);
 
             $media_libraries['whatsapp']->send(
@@ -386,10 +384,7 @@ class RewardExchange extends \SejoliSA\Notification\Main {
         // send sms for buyer
         if(false !== $this->is_able_to_send('sms', 'buyer')) :
     		$media_libraries['sms']->set_data([
-    			'order_data'     => $this->order_data,
-    			'product_data'   => $this->product_data,
-    			'buyer_data'     => $this->buyer_data,
-    			'affiliate_data' => $this->affiliate_data,
+                'user_data' => $user_data,
     		]);
 
             $media_libraries['sms']->send(
