@@ -7,83 +7,47 @@ if(false !== $point_response['valid']) :
 endif;
 ?>
 <h2 class="ui header"><?php _e('Tukar Poin', 'sejoli'); ?></h2>
-<table id="sejoli-reward" class="ui striped single line table" style="width:100%;word-break: break-word;white-space: normal;">
-    <thead>
-        <tr>
-            <th><?php _e('Reward', 'sejoli'); ?></th>
-            <th><?php _e('Poin', 'sejoli'); ?></th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-    <tfoot>
-        <tr>
-            <th><?php _e('Reward', 'sejoli'); ?></th>
-            <th><?php _e('Poin', 'sejoli'); ?></th>
-            <th></th>
-        </tr>
-    </tfoot>
-</table>
+<div id='sejoli-reward-list' class="ui three column doubling stackable cards item-holder masonry grid">
+</div>
+<script id='reward-template' type="text/x-js-render">
+    <?php include 'jsrender/reward-item.php'; ?>
+</script>
 <script type="text/javascript">
 (function($){
 
     'use strict';
 
-    let sejoli_table;
+    let sejoli_current_user_point = parseInt(<?php echo $point; ?>);
 
     $(document).ready(function(){
 
-        sejoli_table = $('#sejoli-reward').DataTable({
-            language: dataTableTranslation,
-            searching: true,
-            processing: true,
-            serverSide: false,
-            info: false,
-            pagination: false,
-            ajax: {
-                type: 'POST',
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                data: function(data) {
-                    data.action = 'sejoli-available-reward-table';
-                    data.nonce = '<?php echo wp_create_nonce('sejoli-render-reward-table'); ?>';
-                }
+        $.ajax({
+            url:    '<?php echo admin_url('admin-ajax.php'); ?>',
+            type:   'POST',
+            data: {
+                action: 'sejoli-available-reward-table',
+                nonce:  '<?php echo wp_create_nonce('sejoli-render-reward-table'); ?>'
             },
-            order: [
-                [ 1, "desc" ]
-            ],
-            columnDefs: [
-                {
-                    targets: [0, 2],
-                    orderable: false
-                },{
-                    targets: 0,
-                    data: 'id',
-                    render: function(data, meta, full) {
-                        let tmpl = $.templates('#reward-detail');
-                        return tmpl.render(full);
-                    }
-                },{
-                    targets: 1,
-                    data: 'point',
-                    width: '80px',
-                    className: 'price',
-                },{
-                    targets: 2,
-                    width:  '160px',
-                    className: 'center',
-                    render: function(data, meta, full) {
-                        return '<button class="small ui button blue sejoli-reward-exchange" data-reward-id="' + full.id  + '" data-reward-name="' + full.title + '" data-reward-point="' + full.point + '"><?php echo _e('Tukar Poin', 'sejoli'); ?></button>'
-                    }
-                }
-            ]
+            dataType: 'json',
+            beforeSend: function(){
+                $('#sejoli-reward-list').block();
+            },
+            success: function(response) {
+                $('#sejoli-reward-list').unblock()
+                let tmpl = $.templates('#reward-template'),
+                    html = tmpl.render({
+                                rewards : response.data
+                            });
+
+                $('#sejoli-reward-list').html(html);
+            }
         });
 
         $('body').on('click', '.sejoli-reward-exchange', function(){
             let reward_name = $(this).data('reward-name'),
                 reward_id = $(this).data('reward-id'),
                 reward_point = parseInt($(this).data('reward-point')),
-                user_reward = parseInt(<?php echo $point; ?>),
+                user_reward = sejoli_current_user_point,
                 confirmed = confirm('<?php _e('Anda yakin akan menukar point anda dengan hadiah ', 'sejoli'); ?>' + reward_name + '?'),
                 button = $(this);
 

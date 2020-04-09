@@ -334,7 +334,10 @@ class Json extends \SejoliSA\JSON {
 			$rewards = new \WP_Query([
 	            'post_type'      => SEJOLI_REWARD_CPT,
 	            'posts_per_page' => -1,
-				'post_status'	 => 'publish'
+				'post_status'    => 'publish',
+				'meta_key'       => '_reward_point',
+				'orderby'        => 'meta_value_num',
+				'order'          => 'DESC'
 	        ]);
 
 	        if($rewards->have_posts()) :
@@ -345,9 +348,9 @@ class Json extends \SejoliSA\JSON {
 
 	                $data[] = [
 	                    'id'   		=> get_the_ID(),
-						'image'     => get_the_post_thumbnail_url(get_the_ID(), 'thumbnail'),
+						'image'     => get_the_post_thumbnail_url(get_the_ID(), 'lager'),
 	                    'title' 	=> get_the_title(),
-						'content'   => get_the_content(),
+						'content'   => wpautop(get_the_content()),
 						'point'     => carbon_get_the_post_meta('reward_point')
 	                ];
 

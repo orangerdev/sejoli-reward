@@ -3,7 +3,7 @@
 <table id="sejoli-point" class="ui striped single line table" style="width:100%;word-break: break-word;white-space: normal;">
     <thead>
         <tr>
-            <th><?php _e('Tgl', 'sejoli'); ?></th>
+            <th><?php _e('Tanggal', 'sejoli'); ?></th>
             <th><?php _e('Detil', 'sejoli'); ?></th>
             <th><?php _e('Poin', 'sejoli'); ?></th>
             <th><?php _e('Tipe', 'sejoli'); ?></th>
@@ -13,7 +13,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <th><?php _e('Tgl', 'sejoli'); ?></th>
+            <th><?php _e('Tanggal', 'sejoli'); ?></th>
             <th><?php _e('Detil', 'sejoli'); ?></th>
             <th><?php _e('Poin', 'sejoli'); ?></th>
             <th><?php _e('Tipe', 'sejoli'); ?></th>
