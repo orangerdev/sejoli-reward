@@ -156,7 +156,7 @@ Class Reward extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('update-exhcange-valid-point', 'get-single', 'get-detail'))) :
+        if(in_array(self::$action, array('update-exhcange-valid-point', 'get-detail'))) :
 
             if(empty(self::$id)) :
                 self::set_valid(false);
@@ -326,7 +326,7 @@ Class Reward extends \SejoliSA\Model
 
                 self::set_valid(false);
 
-            endif;        
+            endif;
 
         endif;
 
