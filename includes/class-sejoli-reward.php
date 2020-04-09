@@ -139,6 +139,7 @@ class Sejoli_Reward {
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
+		require_once SEJOLI_REWARD_DIR . 'public/checkout.php';
 		require_once SEJOLI_REWARD_DIR . 'public/member.php';
 		require_once SEJOLI_REWARD_DIR . 'public/public.php';
 
@@ -219,7 +220,6 @@ class Sejoli_Reward {
 		$this->loader->add_action( 'sejoli/notification/reward/exchange',	$notification, 'send_reward_exchange_notification', 12);
 		$this->loader->add_action( 'sejoli/notification/reward/cancel',		$notification, 'send_reward_cancel_notification', 12);
 
-
 		$order  = new Sejoli_Reward\Admin\Order( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'sejoli/order/new',							$order, 'add_reward_point_for_buyer', 		8);
@@ -261,6 +261,10 @@ class Sejoli_Reward {
 	 * @access   private
 	 */
 	private function define_public_hooks() {
+
+		$checkout = new Sejoli_Reward\Front\Checkout( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'sejoli/checkout-template/after-product', 	$checkout, 'display_point', 12);
 
 		$public = new Sejoli_Reward\Front( $this->get_plugin_name(), $this->get_version() );
 
