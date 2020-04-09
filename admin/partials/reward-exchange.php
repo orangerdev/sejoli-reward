@@ -178,7 +178,7 @@ let sejoli_table;
 })(jQuery);
 </script>
 <script id='user-detail' type="text/x-jsrender">
-<a type='button' class='ui mini button' href='{{:detail_url}}' target='_blank'>DETAIL</a> {{:display_name}}
+{{:display_name}}
 <div style='line-height:220%'>
     <span class="ui purple label"><i class="envelope icon"></i>{{:email}}</span>
 </div>

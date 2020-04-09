@@ -214,8 +214,9 @@ class Sejoli_Reward {
 		$this->loader->add_filter( 'sejoli/email/template-directory',		$notification, 'set_notification_directory', 12, 4);
 		$this->loader->add_filter( 'sejoli/sms/template-directory',			$notification, 'set_notification_directory', 12, 4);
 		$this->loader->add_filter( 'sejoli/whatsapp/template-directory',	$notification, 'set_notification_directory', 12, 4);
-		
+
 		$this->loader->add_filter( 'sejoli/notification/libraries',			$notification, 'add_libraries', 12);
+		$this->loader->add_action( 'sejoli/notification/reward/exchange',	$notification, 'send_reward_exchange_notification', 12);
 
 
 		$order  = new Sejoli_Reward\Admin\Order( $this->get_plugin_name(), $this->get_version() );

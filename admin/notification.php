@@ -55,6 +55,13 @@ class Notification {
 	);
 
 	/**
+	 * Notification libraries
+	 * @since	1.0.0
+	 * @var 	array
+	 */
+	protected $libraries = array();
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since   1.0.0
@@ -66,6 +73,19 @@ class Notification {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+		add_action('admin_init',	array($this, 'test'));
+
+	}
+
+	public function test() {
+
+		if(isset($_GET['dylan'])) :
+			$request_id = intval($_GET['dylan']);
+			$response = sejoli_get_single_point_detail($request_id);
+
+			do_action('sejoli/notification/reward/exchange', $response['point']);
+			exit;
+		endif;
 	}
 
 	/**
@@ -86,7 +106,6 @@ class Notification {
 
 		if(in_array($filename, $this->notification_files)) :
 			$directory_path = SEJOLI_REWARD_DIR . 'template/' . $media . '/';
-			__debug($directory_path);
 		endif;
 
 		return $directory_path;
@@ -106,6 +125,32 @@ class Notification {
         $libraries['reward-exchange'] = new \Sejoli_Reward\Notification\RewardExchange;
         $libraries['reward-cancel']   = new \Sejoli_Reward\Notification\RewardCancel;
 
+		$this->libraries = $libraries;
+
         return $libraries;
     }
+
+	/**
+	 * Send reward exchange notification
+	 * Hooked via action sejoli/notification/reward/exchange, priority 1
+	 * @since 	1.0.0
+	 * @param  	array $point_data
+	 * @return 	void
+	 */
+	public function send_reward_exchange_notification($point_data) {
+
+		$point_data                = (array) $point_data;
+		$reward                    = get_post($point_data['reward_id']);
+		$user                      = sejolisa_get_user($point_data['user_id']);
+		$point_data['reward-name'] = $reward->post_title;
+
+		$this->libraries['reward-exchange']->trigger(
+			(array) $point_data,
+			array(
+				'user_name'  => $user->display_name,
+				'user_email' => $user->user_email,
+				'user_phone' => $user->meta->user_phone
+			));
+
+	}
 }

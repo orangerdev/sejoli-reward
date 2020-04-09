@@ -156,7 +156,7 @@ Class Reward extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('update-exhcange-valid-point', 'get-single'))) :
+        if(in_array(self::$action, array('update-exhcange-valid-point', 'get-single', 'get-detail'))) :
 
             if(empty(self::$id)) :
                 self::set_valid(false);
@@ -164,6 +164,7 @@ Class Reward extends \SejoliSA\Model
             endif;
 
         endif;
+
     }
 
     /**
@@ -290,6 +291,42 @@ Class Reward extends \SejoliSA\Model
                 endif;
 
             endif;
+
+        endif;
+
+        return new static;
+    }
+
+    /**
+     * Get single point detail
+     * @since   1.0.0
+     */
+    static public function get_point_detail() {
+
+        self::set_action('get-detail');
+        self::validate();
+
+        if(false !== self::$valid) :
+
+            parent::$table = self::$table;
+
+            $query = Capsule::table(self::table())
+                            ->where(array(
+                                'ID'    => self::$id,
+                            ));
+
+            $point = $query->first();
+
+            if($point) :
+
+                self::set_valid(true);
+                self::set_respond('point', $point);
+
+            else :
+
+                self::set_valid(false);
+
+            endif;        
 
         endif;
 
@@ -428,7 +465,6 @@ Class Reward extends \SejoliSA\Model
 
         return new static;
     }
-
 
     /**
      * Add point with OUT type

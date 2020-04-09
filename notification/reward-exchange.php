@@ -21,6 +21,12 @@ class RewardExchange extends \SejoliSA\Notification\Main {
     protected $user_data;
 
     /**
+     * Set point data
+     * @var array
+     */
+    protected $point_data;
+
+    /**
      * Attachment for file
      * @since   1.0.0
      * @var     bool|array
@@ -54,7 +60,7 @@ class RewardExchange extends \SejoliSA\Notification\Main {
 
 				Field::make('text', 	'point_exchange_email_title',	 __('Judul' ,'sejoli'))
 					->set_required(true)
-					->set_default_value(__('{{user-name}}, penukaran poin untuk {{reward-name}} telah dibatalkan', 'sejoli')),
+					->set_default_value(__('{{user-name}}, anda telah melakukan penukaran poin untuk {{reward-name}}', 'sejoli')),
 
 				Field::make('rich_text', 'point_exchange_email_content', __('Konten', 'sejoli'))
 					->set_required(true)
@@ -273,13 +279,11 @@ class RewardExchange extends \SejoliSA\Notification\Main {
      */
     public function add_shortcode_detail(array $shortcodes) {
 
-        $shortcodes['{{memberurl}}']  = home_url('/member-area/');
-        $shortcodes['{{sitename}}']   = get_bloginfo('name');
-        $shortcodes['{{siteurl}}']    = home_url('/');
-        $shortcodes['{{user-name}}']  = $this->user_data['user_name'];
-        $shortcodes['{{user-email}}'] = $this->user_data['user_email'];
-        $shortcodes['{{user-pass}}']  = $this->user_data['user_password'];
-        $shortcodes['{{user-phone}}'] = $this->user_data['user_phone'];
+        $shortcodes['{{site-url}}']       = home_url('/');
+        $shortcodes['{{user-name}}']      = $this->user_data['user_name'];
+        $shortcodes['{{buyer-name}}']     = $this->user_data['user_name'];
+        $shortcodes['{{reward-name}}']    = $this->point_data['reward-name'];
+        $shortcodes['{{point-exchange}}'] = $this->point_data['point'];
 
         return $shortcodes;
     }
@@ -290,10 +294,11 @@ class RewardExchange extends \SejoliSA\Notification\Main {
      * @param   array  $order_data   Order data
      * @return  void
      */
-    public function trigger(array $user_data) {
+    public function trigger($point_data, $user_data) {
 
-        $this->user_data = $user_data;
-        $media_libraries = $this->get_media_libraries();
+        $this->point_data = $point_data;
+        $this->user_data  = $user_data;
+        $media_libraries  = $this->get_media_libraries();
 
         $this->shortcode_data = $this->add_shortcode_detail([]);
         $this->set_content();

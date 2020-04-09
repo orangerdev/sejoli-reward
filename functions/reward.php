@@ -191,6 +191,9 @@ function sejoli_exchange_reward($reward_id, $user_id = 0) {
                                                 $reward->post_title,
                                                 $available_point - $reward_point
                                               );
+
+                    do_action('sejoli/notification/reward/exchange', $exchange_response['point']);
+
                 else :
                     $response['messages'][] = __('Telah terjadi kesalahan di dalam sistem. Silahkan kontak administrator', 'sejoli');
                 endif;
@@ -334,4 +337,17 @@ function sejoli_update_exchange_point_validity($id, $valid = false) {
                         ->set_valid_point($valid)
                         ->update_exchange_valid_point()
                         ->respond();
+}
+
+/**
+ * Get single point detail
+ * @since   1.0.0
+ * @param   interger    $id
+ * @return  array
+ */
+function sejoli_get_single_point_detail($id) {
+    return \SEJOLI_REWARD\Model\Reward::reset()
+                ->set_id($id)
+                ->get_point_detail()
+                ->respond();
 }
