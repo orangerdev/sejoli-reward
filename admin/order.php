@@ -81,7 +81,7 @@ class Order {
 
         if(property_exists($this->product, 'reward_point')) :
 
-            $product_reward_point = $this->product->reward_point;
+            $product_reward_point = absint($this->product->reward_point);
 
         endif;
 
@@ -95,7 +95,7 @@ class Order {
 
             if($product_group_setup['reward_enable']) :
                 $enable_reward        = true;
-                $product_reward_point = $product_group_setup['reward_point'];
+                $product_reward_point = absint($product_group_setup['reward_point']);
                 $calculate = 'user-group-per-product';
             endif;
 
@@ -106,7 +106,7 @@ class Order {
             $product_group_setup['reward_enable']
         ) :
             $enable_reward        = true;
-            $product_reward_point = $product_group_setup['reward_point'];
+            $product_reward_point = absint($product_group_setup['reward_point']);
             $calculate            = 'user-group';
         endif;
 
@@ -125,7 +125,7 @@ class Order {
                 'product_id'   => $product_id,
                 'order_status' => $order_data['status'],
                 'user_id'      => $this->buyer_id,
-                'point'        => $product_reward_point,
+                'point'        => $order_data['quantity'] * $product_reward_point,
                 'reward_id'    => 0,
                 'valid_point'  => false,
                 'meta_data'    => array(
