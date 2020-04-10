@@ -103,7 +103,7 @@ function run_sejoli_reward() {
 
 }
 
-require_once(SEJOLP_DIR . 'third-parties/yahnis-elsts/plugin-update-checker/plugin-update-checker.php');
+require_once(SEJOLI_REWARD_DIR . 'third-parties/yahnis-elsts/plugin-update-checker/plugin-update-checker.php');
 
 $update_checker = Puc_v4_Factory::buildUpdateChecker(
 	'https://github.com/orangerdev/sejoli-reward',
