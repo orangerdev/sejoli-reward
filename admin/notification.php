@@ -73,19 +73,6 @@ class Notification {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
-		add_action('admin_init',	array($this, 'test'));
-
-	}
-
-	public function test() {
-
-		if(isset($_GET['dylan'])) :
-			$request_id = intval($_GET['dylan']);
-			$response = sejoli_get_single_point_detail($request_id);
-
-			do_action('sejoli/notification/reward/cancel', $response['point']);
-			exit;
-		endif;
 	}
 
 	/**
