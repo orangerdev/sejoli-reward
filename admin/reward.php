@@ -244,6 +244,9 @@ class Reward {
 
 		$extra_fields = array(
 
+			Field::make('separator', 'sep_reward', __('Pengaturan Reward', 'sejoli'))
+				->set_classes('sejoli-with-help'),
+
 			Field::make('checkbox', 'group_reward_enable', __('Aktikan poin reward', 'sejoli-reward')),
 
 			Field::make('text', 	'group_reward_point',  __('Poin reward', 'sejoli-reward'))
@@ -273,6 +276,9 @@ class Reward {
 	public function set_user_group_per_product_fields($fields) {
 
 		$extra_fields = array(
+			Field::make('separator', 'sep_reward', __('Pengaturan Reward', 'sejoli'))
+				->set_classes('sejoli-with-help'),
+
 			Field::make('checkbox', 'reward_enable', __('Aktikan poin reward', 'sejoli-reward')),
 
 			Field::make('text', 	'reward_point',  __('Poin reward', 'sejoli-reward'))
@@ -287,7 +293,7 @@ class Reward {
 				))
 		);
 
-		array_splice($fields, 2, 0, $extra_fields);
+		array_splice($fields, 1, 0, $extra_fields);
 
 		return $fields;
 	}
