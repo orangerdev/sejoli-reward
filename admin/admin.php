@@ -119,4 +119,26 @@ class Admin {
 		));
 	}
 
+	/**
+	 * Enqueue needed css and js files
+	 * Hooked via action admin_enqueue_scripts, priority 1099
+	 * @since 	1.1.0
+	 * @return 	void
+	 */
+	public function enqueue_css_js_scripts() {
+
+		global $pagenow;
+
+		if(
+			'admin.php' === $pagenow &&
+			isset($_GET['page']) &&
+			'sejoli-point-input-form' === $_GET['page']
+		) :
+
+			wp_enqueue_style 	( 'select2' );
+			wp_enqueue_script 	( 'select2' );
+
+		endif;
+	}
+
 }
