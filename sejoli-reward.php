@@ -16,7 +16,7 @@
  * Plugin Name:       Sejoli - Reward
  * Plugin URI:        https://sejoli.co.id
  * Description:       Implement reward system into SEJOLI premium membership WordPress plugin
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            Ridwan Arifandi
  * Author URI:        https://ridwan-arifandi.com
  * License:           GPL-2.0+
@@ -37,7 +37,7 @@ global $sejoli_reward;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'SEJOLI_REWARD_VERSION'	, '1.0.0' );
+define( 'SEJOLI_REWARD_VERSION'	, '1.1.0' );
 define( 'SEJOLI_REWARD_CPT'		, 'sejoli-reward');
 define( 'SEJOLI_REWARD_DIR' 	, plugin_dir_path( __FILE__ ) );
 define( 'SEJOLI_REWARD_URL' 	, plugin_dir_url( __FILE__ ) );
