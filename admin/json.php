@@ -117,6 +117,7 @@ class Json extends \SejoliSA\JSON {
      * Get point history for a user
      * Hooked via filter wp_ajax_sejoli-single-user-point-table, priority 1
      * @since   1.0.0
+     * @since 	1.1.0	Add meta_data type manual description
      * @return  array
      */
     public function ajax_set_single_user_for_table() {
@@ -147,13 +148,29 @@ class Json extends \SejoliSA\JSON {
 						switch($_data->meta_data['type']) :
 
 							case 'order' :
+
 								$product = sejolisa_get_product($_data->product_id);
-								$detail = sprintf(__('Poin dari order %s untuk produk %s', 'sejoli-reward'), $_data->order_id, $product->post_title);
+								$detail  = sprintf(
+												__('Poin dari order %s untuk produk %s', 'sejoli-reward'),
+												$_data->order_id,
+												$product->post_title
+										   );
 								break;
 
 							case 'affiliate' :
+
 								$product = sejolisa_get_product($_data->product_id);
-								$detail = sprintf(__('Poin dari affiliasi order %s untuk produk %s, tier %s', 'sejoli-reward'), $_data->order_id, $product->post_title, $_data->meta_data['tier']);
+								$detail  = sprintf(
+												__('Poin dari affiliasi order %s untuk produk %s, tier %s', 'sejoli-reward'),
+												$_data->order_id,
+												$product->post_title,
+												$_data->meta_data['tier']
+										  );
+								break;
+
+							case 'manual' :
+							
+								$detail 	= $_data->meta_data['note'] . '. ' . $_data->meta_data['input'];
 								break;
 
 						endswitch;
