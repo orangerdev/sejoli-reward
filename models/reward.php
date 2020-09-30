@@ -100,7 +100,7 @@ Class Reward extends \SejoliSA\Model
      */
     static protected function validate() {
 
-        if(in_array(self::$action, array('add', 'reduce'))) :
+        if(in_array(self::$action, array('add', 'reduce', 'manual-input'))) :
 
             if(empty(self::$point)) :
                 self::set_valid(false);
@@ -114,7 +114,7 @@ Class Reward extends \SejoliSA\Model
 
         endif;
 
-        if(in_array(self::$action, array('add', 'reduce', 'get-single'))) :
+        if(in_array(self::$action, array('add', 'reduce', 'get-single', 'manual-input'))) :
 
             if(!is_a(self::$user, 'WP_User')) :
                 self::set_valid(false);
@@ -236,6 +236,43 @@ Class Reward extends \SejoliSA\Model
                 );
 
             endif;
+
+        endif;
+
+        return new static;
+    }
+
+    /**
+     * Add data manually by access confirmed user
+     * @since   1.1.0
+     */
+    static public function manual_input() {
+
+        self::set_action('manual-input');
+        self::validate();
+
+        if(false !== self::$valid) :
+
+            parent::$table = self::$table;
+
+            $point = [
+                'created_at'   => current_time('mysql'),
+                'order_id'     => 0,
+                'order_status' => 'in' === self::$type ? 'completed' : '',
+                'product_id'   => 0,
+                'user_id'      => self::$user->ID,
+                'point'        => self::$point,
+                'type'         => self::$type,
+                'reward_id'    => 0,
+                'valid_point'  => 1,
+                'meta_data'    => serialize(self::$meta_data),
+            ];
+
+            $point['ID'] = Capsule::table(self::table())
+                            ->insertGetId($point);
+
+            self::set_valid     (true);
+            self::set_respond   ('point', $point);
 
         endif;
 
