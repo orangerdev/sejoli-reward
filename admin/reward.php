@@ -120,6 +120,7 @@ class Reward {
 	 * Add new submenu under Reward menu
 	 * Hooked via action admin_menu, priority 122
 	 * @since 	1.0.0
+	 * @since 	1.1.0	Add 'Perubahan Poin' menu
 	 * @return	void
 	 */
 	public function add_custom_point_menu() {
@@ -140,6 +141,18 @@ class Reward {
 			'manage_sejoli_sejoli',
 			'sejoli-reward-exchange',
 			array($this, 'display_reward_exchange')
+		);
+
+		/**
+		 * @since 1.1.0
+		 */
+		add_submenu_page(
+			'edit.php?post_type=' .  SEJOLI_REWARD_CPT,
+			__('Sejoli - Perubahan Poin', 'sejoli'),
+			__('Perubahan Poin', 'sejoli'),
+			'manage_sejoli_sejoli',
+			'sejoli-point-input-form',
+			array($this, 'display_reward_form')
 		);
 
 	}
@@ -422,7 +435,6 @@ class Reward {
 		return $group_detail;
 	}
 
-
 	/**
 	 * Set reward point in user group detail
 	 * Hooked via filter sejoli/user-group/detail, priority 12
@@ -563,5 +575,106 @@ class Reward {
 	 */
 	public function display_reward_exchange() {
 		require_once( plugin_dir_path( __FILE__ ) . 'partials/reward-exchange.php' );
+	}
+
+	/**
+	 * Add manual input point data
+	 * Hooked via action wp_ajax_nopriv_add-input-point-data, priority 1
+	 * @since 1.1.0
+	 */
+	public function add_manual_input_data() {
+
+		$response 	= array(
+			'success' => false,
+			'message' => __('Ada kesalahan terjadi di sistem', 'sejoli')
+		);
+
+		if(
+			isset( $_POST['noncekey'] ) &&
+			check_ajax_referer( 'sejoli-add-point-data', 'noncekey' ) &&
+			isset( $_POST['data'] ) &&
+			current_user_can( 'manage_sejoli_sejoli' )
+		) :
+
+			$user 	= wp_get_current_user();
+
+			$data 	= wp_parse_args( $_POST['data'], array(
+				'user_id'   => 0,
+				'point'     => 0,
+				'operation' => 'add',
+				'note'      => ''
+			));
+
+			$point_respond = sejoli_manual_input_point( array(
+				'order_id'    => 0,
+				'product_id'  => 0,
+				'user_id'     => $data['user_id'],
+				'value'       => $data['point'],
+				'type'        => 'add' === $data['operation'] ? 'in' : 'out',
+				'label'       => 'manual',
+				'valid_point' => true,
+				'meta_data'   => array(
+					'type'  => 'manual',
+					'note'  => esc_html( $data['note'] ),
+					'input' => sprintf( __('Input by %s', 'sejoli'), $user->display_name )
+				)
+			) );
+
+			if( false !== $point_respond['valid'] ) :
+
+				$user 	= get_user_by( 'ID', $data['user_id'] );
+
+				$response['success']	= true;
+				$response['message']	= sprintf(
+											__('%s poin sebesar %s untuk %s sudah berhasil diproses.', 'sejoli' ),
+											(  'add' === $data['operation'] ) ? 'Penambahan' : 'Pengurangan',
+											$data['point'],
+											$user->display_name
+										  );
+
+			else :
+
+				$response['message'] = implode( '<br />', $point_respond['messages']['error'] );
+
+			endif;
+
+		endif;
+
+		echo wp_send_json($response);
+		exit;
+
+	}
+
+	/**
+	 * Display notice in wallet page
+	 * Hooked via action admin_notices, priority 1.1.0
+	 * @since 	1.1.0
+	 * @return 	void
+	 */
+	public function display_notice() {
+
+		if(
+			isset($_GET['page'] ) &&
+			'sejoli-point-input-form' === $_GET['page']
+		) :
+		?>
+			<div class="sejoli-point-form-response notice" style='display:none'>
+
+			</div>
+		<?php
+		endif;
+
+	}
+
+	/**
+	 * Display reward input form
+	 * Called from $this->add_custom_point_menu()
+	 * @since 	1.1.0
+	 * @return 	void
+	 */
+	public function display_reward_form() {
+
+		require_once( plugin_dir_path( __FILE__ ) . 'partials/input-form.php' );
+
 	}
 }
