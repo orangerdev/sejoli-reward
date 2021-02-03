@@ -360,11 +360,14 @@ class Reward {
 
 		// Modify reward point by user group
 		if(is_user_logged_in()) :
+
 			$group                 = sejolisa_get_user_group();
 			$product->reward_point = (false !== $group['reward_enable']) ? absint($group['reward_point']) : $product->reward_point;
 
 			if(
+				false !== $group &&
 				array_key_exists('per_product', $group) &&
+				is_array( $group['per_product'] ) && 0 < count( $group['per_product'] ) &&
 				array_key_exists($product->ID, $group['per_product'])
 			) :
 				$per_product = $group['per_product'][$product->ID];
