@@ -2,9 +2,9 @@
 Contributors: (this should be a list of wordpress.org userid's)
 Donate link: https://ridwan-arifandi.com
 Tags: membership, reward, point
-Requires at least: 5.5.2
-Tested up to: 5.5.2
-Stable tag: 1.1.0
+Requires at least: 5.6.0
+Tested up to: 5.6.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
