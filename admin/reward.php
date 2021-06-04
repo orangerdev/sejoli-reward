@@ -362,7 +362,7 @@ class Reward {
 		if(is_user_logged_in()) :
 
 			$group                 = sejolisa_get_user_group();
-			$product->reward_point = (false !== $group['reward_enable']) ? absint($group['reward_point']) : $product->reward_point;
+			$product->reward_point = (false !== $group['reward_enable'] ) ? absint($group['reward_point']) : $product->reward_point;
 
 			if(
 				false !== $group &&
@@ -504,7 +504,7 @@ class Reward {
 		if(
 			'edit.php' === $pagenow &&
 			isset($_GET['post_type']) && SEJOLI_REWARD_CPT === $_GET['post_type'] &&
-			isset($_GET['page']) && in_array($_GET['page'], array('sejoli-reward-exchange', 'sejoli-reward-point'))
+			isset($_GET['page']) && in_array($_GET['page'], array('sejoli-reward-exchange', 'sejoli-reward-point', 'sejoli-point-input-form'))
 		) :
 			return true;
 		endif;
@@ -679,5 +679,26 @@ class Reward {
 
 		require_once( plugin_dir_path( __FILE__ ) . 'partials/input-form.php' );
 
+	}
+
+	/**
+	 * Set javascript footer JS
+	 * Hooked via action admin_footer, priority 122
+	 * @since 	1.1.1
+	 * @return 	void
+	 */
+	public function admin_footer() {
+
+		global $pagenow;
+
+		if(
+			'edit.php' === $pagenow &&
+			isset($_GET['page']) &&
+			'sejoli-point-input-form' === $_GET['page']
+		) :
+
+			require_once( plugin_dir_path( __FILE__ ) . 'partials/input-form-js.php');
+
+		endif;
 	}
 }

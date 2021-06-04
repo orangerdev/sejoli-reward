@@ -243,6 +243,7 @@ class Sejoli_Reward {
 		$this->loader->add_action( 'manage_posts_custom_column',			$reward, 'display_data_in_post_columns', 1222, 2);
 		$this->loader->add_filter( 'sejoli/product/meta-data',				$reward, 'set_product_point',		122);
 		$this->loader->add_action( 'admin_menu',							$reward, 'add_custom_point_menu', 	122);
+		$this->loader->add_action( 'admin_footer',							$reward, 'admin_footer',			122);
 		$this->loader->add_filter( 'sejoli/admin/js-localize-data', 		$reward, 'set_localize_js_vars',	12);
 		$this->loader->add_filter( 'sejoli/admin/is-sejoli-page',			$reward, 'is_current_page_sejoli_page', 1222);
 
