@@ -494,8 +494,10 @@ class Reward {
 	/**
 	 * Check if current admin page is a sejoli page
 	 * Hooked via filter sejoli/admin/is-sejoli-page, priority 1222
-	 * @param  boolean $is_sejoli_page
-	 * @return boolean
+	 * @since 	1.1.0
+	 * @since 	1.1.1	Add sejoli-point-input form page
+	 * @param  	boolean $is_sejoli_page
+	 * @return 	boolean
 	 */
 	public function is_current_page_sejoli_page($is_sejoli_page) {
 
