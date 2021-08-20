@@ -155,6 +155,19 @@ class Reward {
 			array($this, 'display_reward_form')
 		);
 
+		/**
+		 * @since 1.0.0
+		 */
+
+		add_submenu_page(
+			'edit.php?post_type=' .  SEJOLI_REWARD_CPT,
+			__('Sejoli - Poin Expired', 'sejoli'),
+			__('Expired Point', 'sejoli'),
+			'manage_sejoli_sejoli',
+			'sejoli-point-expired-form',
+			array($this, 'set_expired_point')
+		);
+
 	}
 
     /**
@@ -559,6 +572,7 @@ class Reward {
 		return $js_vars;
 	}
 
+
 	/**
 	 * Display all user point
 	 * @since 	1.0.0
@@ -651,6 +665,57 @@ class Reward {
 	}
 
 	/**
+	 * Proccess expired point data
+	 * Hooked via action wp_ajax_nopriv_set-expired-point-data, priority 1
+	 * @return void
+	 */
+	public function set_expired_point_data(){
+
+		$response 	= array(
+			'success' => false,
+			'message' => __('Ada kesalahan terjadi di sistem', 'sejoli')
+		);
+
+		if(
+			isset( $_POST['noncekey'] ) &&
+			check_ajax_referer( 'sejoli-set-expired-point', 'noncekey' ) &&
+			isset( $_POST['expired-date'] ) &&
+			current_user_can( 'manage_sejoli_sejoli' )
+		) :
+
+			
+			$post_expired_date = $_POST['expired-date'];
+			$expired_date = str_replace('/', '-', $post_expired_date);
+			$set_expired_date = date('Y-m-d', strtotime($expired_date));
+			$check_timestamp = strtotime($set_expired_date);
+
+			if(
+				$check_timestamp === 0
+			):
+
+				$response['success']		= false;
+				$response['message']		= 'Tanggal Belum dipilih. Silahkan pilih terlebih dahulu';
+				$response['expired_date']	= $check_timestamp;
+
+			else:
+
+				\SEJOLI_REWARD\Model\Reward::set_expired_point($set_expired_date);			
+
+				$response['success']	  = true;
+				$response['message']	  = 'Data point berhasil diproses';
+				$response['expired_date'] = $set_expired_date;
+
+			endif;
+
+		endif;
+		
+		echo wp_send_json($response);		
+		exit;
+
+
+	}
+
+	/**
 	 * Display notice in wallet page
 	 * Hooked via action admin_notices, priority 1.1.0
 	 * @since 	1.1.0
@@ -684,6 +749,17 @@ class Reward {
 	}
 
 	/**
+	 * Display Set expired point
+	 * Called from $this->add_custom_point_menu()
+	 *
+	 * @return void
+	 */
+
+	public function set_expired_point(){		;
+		require_once( plugin_dir_path( __FILE__ ) . 'partials/set-expired.php' );
+	}
+
+	/**
 	 * Set javascript footer JS
 	 * Hooked via action admin_footer, priority 122
 	 * @since 	1.1.1
@@ -700,6 +776,20 @@ class Reward {
 		) :
 
 			require_once( plugin_dir_path( __FILE__ ) . 'partials/input-form-js.php');
+
+		endif;
+
+		// js handle for set expired plugin proccess
+
+		if(
+			'edit.php' === $pagenow &&
+			isset($_GET['page']) &&
+			'sejoli-point-expired-form' === $_GET['page']
+		) :
+			
+			do_action('sejoli/reward/expired-point/jquery-datepicker');
+
+			require_once( plugin_dir_path( __FILE__ ) . 'partials/set-expired-js.php');
 
 		endif;
 	}

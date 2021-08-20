@@ -141,4 +141,18 @@ class Admin {
 		endif;
 	}
 
+	/**
+	 * add_date_picker
+	 * enque jquery ui date picker
+	 * Hooked via action 
+	 *
+	 * @return void
+	 */
+
+	public function add_datepicker_css_js_scripts(){
+		wp_enqueue_script( 'jquery-ui-datepicker' );
+		wp_register_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
+		wp_enqueue_style( 'jquery-ui' );
+	}
+
 }

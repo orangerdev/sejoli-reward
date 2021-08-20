@@ -196,9 +196,10 @@ class Sejoli_Reward {
 
 		$admin = new Sejoli_Reward\Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'sejoli/database/setup',			$admin, 'register_database', 1);
-		$this->loader->add_action( 'admin_bar_menu',				$admin, 'add_point_link',	 12222);
-		$this->loader->add_action( 'admin_enqueue_scripts',			$admin, 'enqueue_css_js_scripts', 1099);
+		$this->loader->add_action( 'sejoli/database/setup',								$admin, 'register_database', 1);
+		$this->loader->add_action( 'admin_bar_menu',									$admin, 'add_point_link',	 12222);
+		$this->loader->add_action( 'admin_enqueue_scripts',								$admin, 'enqueue_css_js_scripts', 1099);
+		$this->loader->add_action( 'sejoli/reward/expired-point/jquery-datepicker',    	$admin, 'add_datepicker_css_js_scripts', 10);
 
 		$json  = new Sejoli_Reward\Admin\Json( $this->get_plugin_name(), $this->get_version() );
 
@@ -254,6 +255,8 @@ class Sejoli_Reward {
 		$this->loader->add_filter( 'sejoli/product/commission/fields',		$reward, 'set_commission_fields', 	12);
 		$this->loader->add_filter( 'sejoli/user-group/detail',				$reward, 'set_user_group_detail', 	12, 4);
 		$this->loader->add_filter( 'sejoli/user-group/per-product/detail',	$reward, 'set_user_group_per_product_detail', 12, 2);
+		
+		$this->loader->add_action( 'wp_ajax_set-expired-point-data',			$reward, 'set_expired_point_data',	1222);
 
 	}
 

@@ -390,6 +390,17 @@ Class Reward extends \SejoliSA\Model
                         ->join(
                             $wpdb->users . ' AS user', 'user.ID', '=', 'reward.user_id'
                         );
+
+        // ini untuk tampilan detail point 
+        
+        $no_exp_date = get_option('point_expired_date', false); 
+        
+        if($no_exp_date === false):
+            
+        else:
+            $query = $query->where('created_at', '<', $no_exp_date);
+        endif;
+
         $query        = self::set_filter_query( $query );
         $recordsTotal = $query->count();
         $query        = self::set_length_query($query);
@@ -442,6 +453,16 @@ Class Reward extends \SejoliSA\Model
                     ->orderBy('available_point', 'DESC')
                     ->groupBy('user_id');
 
+        $no_exp_date = get_option('point_expired_date', false);             
+
+        if($no_exp_date === false):            
+
+        else:
+
+            $query = $query->where('created_at', '<', $no_exp_date);
+
+        endif;
+
         $query  = self::set_filter_query( $query );
 
         $result = $query->get();
@@ -485,8 +506,22 @@ Class Reward extends \SejoliSA\Model
                         )
                     )
                     ->where('valid_point', true)
-                    ->where('user_id', self::$user_id)
-                    ->first();
+                    ->where('user_id', self::$user_id);
+
+        $no_exp_date = get_option('point_expired_date', false); 
+            
+            
+
+        if($no_exp_date === false):
+            
+            
+        else:
+
+            $query = $query->where('created_at', '<', $no_exp_date);
+
+        endif;
+
+        $query = $query->first();
 
         if($query) :
 
@@ -591,5 +626,29 @@ Class Reward extends \SejoliSA\Model
         endif;
 
         return new static;
+    }
+    
+    /**
+     * set_expired_point
+     *
+     * @return void
+     */
+
+    static public function set_expired_point($set_expired_date){
+
+        $no_expired_date = get_option('point_expired_date', false);
+
+        if($no_expired_date === false):
+
+            add_option( 'point_expired_date', $set_expired_date , '', 'yes' );
+
+        else:
+
+            update_option( 'point_expired_date', $set_expired_date );            
+
+        endif;
+
+        return new static;
+
     }
 }
