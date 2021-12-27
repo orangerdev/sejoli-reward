@@ -89,17 +89,21 @@ class Order {
 
         $enable_reward = false;
 
-        if(array_key_exists($product_id, $product_group_setup['per_product'])) :
+        if($product_group_setup){
 
-            $product_group_setup = $product_group_setup['per_product'][$product_id];
+            if(array_key_exists($product_id, $product_group_setup['per_product'])) :
 
-            if($product_group_setup['reward_enable']) :
-                $enable_reward        = true;
-                $product_reward_point = absint($product_group_setup['reward_point']);
-                $calculate = 'user-group-per-product';
+                $product_group_setup = $product_group_setup['per_product'][$product_id];
+
+                if($product_group_setup['reward_enable']) :
+                    $enable_reward        = true;
+                    $product_reward_point = absint($product_group_setup['reward_point']);
+                    $calculate = 'user-group-per-product';
+                endif;
+
             endif;
 
-        endif;
+        }
 
         if(
             false === $enable_reward &&
