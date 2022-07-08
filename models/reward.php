@@ -453,7 +453,7 @@ Class Reward extends \SejoliSA\Model
                     ->orderBy('available_point', 'DESC')
                     ->groupBy('user_id');
 
-        $no_exp_date = get_option('point_expired_date', false);             
+        $no_exp_date = boolval(get_option('point_expired_date', false));             
 
         if($no_exp_date === false):            
 
