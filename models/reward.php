@@ -455,7 +455,7 @@ Class Reward extends \SejoliSA\Model
 
         $no_exp_date = get_option('point_expired_date', false);             
 
-        if($no_exp_date === false):            
+        if(boolval($no_exp_date) === false) :
 
         else:
 
