@@ -113,7 +113,7 @@ $update_checker = Puc_v4_Factory::buildUpdateChecker(
 
 $update_checker->setBranch('master');
 
-add_action('init', 	'run_sejoli_reward');
+run_sejoli_reward();
 
 register_activation_hook( __FILE__, 'activate_sejoli_reward' );
 register_deactivation_hook( __FILE__, 'deactivate_sejoli_reward' );
