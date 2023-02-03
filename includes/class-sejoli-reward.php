@@ -109,11 +109,16 @@ class Sejoli_Reward {
 		/**
 		 * The class responsible for modelling data.
 		 */
-		if(!class_exists('\SejoliSA\Model')) :
-			require_once SEJOLISA_DIR . 'models/main.php';
-		endif;
+		// if(!class_exists('\SejoliSA\Model')) :
+		// 	require_once SEJOLISA_DIR . 'models/main.php';
+		// endif;
+		 
+		require_once SEJOLI_REWARD_DIR . 'cli/main.php';
 
+		require_once SEJOLI_REWARD_DIR . 'models/main.php';
 		require_once SEJOLI_REWARD_DIR . 'models/reward.php';
+
+		require_once SEJOLI_REWARD_DIR . 'json/main.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality

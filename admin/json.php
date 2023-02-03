@@ -22,7 +22,7 @@ namespace Sejoli_Reward\Admin;
  * @subpackage Sejoli_Reward/admin
  * @author     Ridwan Arifandi <orangerdigiart@gmail.com>
  */
-class Json extends \SejoliSA\JSON {
+class Json extends \SEJOLI_REWARD\JSON {
 
 	/**
 	 * The ID of this plugin.

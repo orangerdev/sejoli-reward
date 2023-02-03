@@ -2,7 +2,7 @@
 
 namespace Sejoli_Reward\CLI;
 
-class Reward extends \SejoliSA\CLI {
+class Reward extends \Sejoli_Reward\CLI {
 
     /**
      * Add point reward
