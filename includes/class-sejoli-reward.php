@@ -280,7 +280,8 @@ class Sejoli_Reward {
 
 		$public = new Sejoli_Reward\Front( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'wp_enqueue_scripts',	$public, 'enqueue_styles', 1222);
+		$this->loader->add_action( 'wp_enqueue_scripts', 	$public, 'enqueue_styles',  999);
+		$this->loader->add_action( 'wp_enqueue_scripts', 	$public, 'enqueue_scripts', 999);
 
 		$member = new Sejoli_Reward\Front\Member( $this->get_plugin_name(), $this->get_version() );
 

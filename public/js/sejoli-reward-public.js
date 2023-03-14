@@ -28,5 +28,15 @@
 	 * Although scripts in the WordPress core, Plugins and Themes may be
 	 * practising this, we should strive to set a better example in our own work.
 	 */
+	
+	$(document).on('sejoli:calculate', function() {
+
+        let reward_value = $('#reward-value').val();
+        let quantity     = $('#qty').val();
+        let total_reward = reward_value * quantity;
+        
+        $('.reward-point-val').text(total_reward + sejoli_reward_exchange.poin_reward_label);
+    
+    });
 
 })( jQuery );

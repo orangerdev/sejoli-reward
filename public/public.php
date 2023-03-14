@@ -76,7 +76,13 @@ class Front {
 	 */
 	public function enqueue_scripts() {
 
+		wp_register_script( 'sejoli-reward-exchange', plugin_dir_url( __FILE__ ) . 'js/sejoli-reward-public.js', 'jquery', $this->version, false );
 
+		wp_enqueue_script( 'sejoli-reward-exchange' );
+
+		wp_localize_script( 'sejoli-reward-exchange', 'sejoli_reward_exchange', array(
+			'poin_reward_label'   => __(' Poin', 'sejoli-reward')
+		) );
 
 	}
 

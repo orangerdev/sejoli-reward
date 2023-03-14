@@ -57,31 +57,37 @@ class Checkout {
             <tr>
                 <th>
                     <?php if('digital' === $product->type || false === $product->enable_quantity) : ?>
-                    <p><?php _e('Total poin yang anda dapatkan', 'sejoli'); ?></p>
+                    <p><?php _e('Total poin yang anda dapatkan per satu item', 'sejoli-reward'); ?></p>
                     <?php else : ?>
-                    <p><?php _e('Total poin yang anda dapatkan per satu item', 'sejoli'); ?></p>
+                    <p><?php _e('Total poin yang anda dapatkan per satu item', 'sejoli-reward'); ?></p>
                     <?php endif; ?>
                 </th>
                 <th>
-                    <?php
-                        printf(_n('%d Poin', '%d Poin', 'sejoli'), $product->reward_point);
-                    ?>
+                    <input type="hidden" id="reward-value" value="<?php echo $product->reward_point; ?>">
+                    <div class="reward-point-val">
+                        <?php
+                            printf(_n('%d Poin', '%d Poin', 'sejoli-reward'), $product->reward_point);
+                        ?>
+                    </div>
                 </th>
             </tr><?php
         else :
             ?>
-            <tr>
-                <td colspan=2>
+            <tr style="padding-top: 1em; display: block;">
+                <td colspan="2" style="width: 50%; padding: 0.78571429em 0.78571429em;">
                     <?php if(false === $product->enable_quantity) : ?>
-                    <p><?php _e('Total poin yang anda dapatkan', 'sejoli'); ?></p>
+                    <p><?php _e('Total poin yang anda dapatkan per satu item', 'sejoli-reward'); ?></p>
                     <?php else : ?>
-                    <p><?php _e('Total poin yang anda dapatkan per satu item', 'sejoli'); ?></p>
+                    <p><?php _e('Total poin yang anda dapatkan per satu item', 'sejoli-reward'); ?></p>
                     <?php endif; ?>
                 </td>
-                <td>
-                    <?php
-                        printf(_n('%d Poin', '%d Poin', 'sejoli'), $product->reward_point);
-                    ?>
+                <td style="width: 30%; text-align: right;">
+                    <input type="hidden" id="reward-value" value="<?php echo $product->reward_point; ?>">
+                    <div class="reward-point-val">
+                        <?php
+                            printf(_n('%d Poin', '%d Poin', 'sejoli-reward'), $product->reward_point);
+                        ?>
+                    </div>
                 </td>
             </tr>
             <?php
