@@ -1,5 +1,9 @@
 <?php
-    $date = date('Y-m-d', strtotime('-30day')) . ' - ' . date('Y-m-d');
+    $date = date('Y-m-d',strtotime('-29 days')) . ' - ' . date('Y-m-d');
+    $export_link = add_query_arg(array(
+                        'sejoli-nonce'  => wp_create_nonce('sejoli-reward-exchanges-export'),
+                        'action'        => 'sejoli-reward-exchanges-csv-export'
+                    ),admin_url('admin-ajax.php'));
 ?>
 <div class="wrap">
     <h1 class="wp-heading-inline">
@@ -9,7 +13,7 @@
         <div class='sejoli-form-action-holder'>
 
             <div class="sejoli-form-filter box" style='float:right;'>
-                <button type="button" name="button" class='export-csv button'><?php _e('Export CSV', 'sejoli'); ?></button>
+                <a href='<?php echo $export_link; ?>' name="button" class='export-csv button'><?php _e('Export CSV', 'sejoli'); ?></a>
                 <button type="button" name="button" class='button toggle-search'><?php _e('Filter Data', 'sejoli'); ?></button>
                 <div class="sejoli-form-filter-holder sejoli-form-float">
                     <input type="text" class='filter' name="date-range" value="<?php echo $date; ?>" placeholder="<?php _e('Pencarian berdasarkan tanggal', 'sejoli'); ?>">
@@ -172,7 +176,37 @@ let sejoli_table;
                 }
             })
             return false;
-        })
+        });
+
+        /**
+         * Do export csv
+         */
+        $(document).on('click', '.export-csv', function() {
+
+            sejoli.helper.filterData();
+
+            var link       = $(this).attr('href');
+            var date_range = $('input[name="date-range"]').val();
+            var reward_id  = $('select[name="reward_id"]').val();
+            var user_id    = $('select[name="user_id"]').val();
+
+            if ( link ) {
+                if ( date_range ) {
+                    link += '&date_range='+date_range;
+                }
+                if ( reward_id ) {
+                    link += '&reward_id='+reward_id;
+                }
+                if ( user_id ) {
+                    link += '&user_id='+user_id;
+                }
+            }
+
+            window.location.replace(link);
+
+            return false;
+
+        });
 
     });
 })(jQuery);

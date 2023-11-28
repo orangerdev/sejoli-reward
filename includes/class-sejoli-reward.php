@@ -216,6 +216,9 @@ class Sejoli_Reward {
 		$this->loader->add_action( 'wp_ajax_sejoli-reward-exchange',			$json, 'ajax_set_reward_exchange', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-reward-options',				$json, 'ajax_get_reward_options', 1);
 		$this->loader->add_action( 'wp_ajax_sejoli-update-reward-point-status', $json, 'ajax_update_reward_point_status', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-reward-exchanges-csv-export',$json, 'export_reward_exchanges_csv', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-user-point-csv-export',      $json, 'export_user_point_csv', 1);
+		$this->loader->add_action( 'wp_ajax_sejoli-single-user-point-csv-export', $json, 'export_single_user_point_csv', 1);
 
 		$notification  = new Sejoli_Reward\Admin\Notification( $this->get_plugin_name(), $this->get_version() );
 

@@ -1,5 +1,9 @@
 <?php
-    $date = date('Y-m-d', strtotime('-30day')) . ' - ' . date('Y-m-d');
+    $date = date('Y-m-d',strtotime('-29 days')) . ' - ' . date('Y-m-d');
+    $export_link = add_query_arg(array(
+                        'sejoli-nonce'  => wp_create_nonce('sejoli-single-user-point-export'),
+                        'action'        => 'sejoli-single-user-point-csv-export'
+                    ),admin_url('admin-ajax.php'));
 ?>
 <div class="wrap">
     <h1 class="wp-heading-inline">
@@ -9,10 +13,11 @@
         <div class='sejoli-form-action-holder'>
 
             <div class="sejoli-form-filter box" style='float:right;'>
-                <button type="button" name="button" class='export-csv button'><?php _e('Export CSV', 'sejoli'); ?></button>
+                <a href='<?php echo $export_link; ?>' name="button" class='export-csv button'><?php _e('Export CSV', 'sejoli'); ?></a>
                 <button type="button" name="button" class='button toggle-search'><?php _e('Filter Data', 'sejoli'); ?></button>
                 <div class="sejoli-form-filter-holder sejoli-form-float">
                     <input type="text" class='filter' name="date-range" value="<?php echo $date; ?>" placeholder="<?php _e('Pencarian berdasarkan tanggal', 'sejoli'); ?>">
+                    <input type="hidden" class='filter' name="user_id" value="<?php echo $_GET['user_id']; ?>">
                     <select class="autosuggest filter" name="product_id"></select>
                     <select class="autosuggest filter" name='type'>
                         <option value=''><?php _e('Pilih tipe poin', 'sejoli'); ?></option>
@@ -78,7 +83,7 @@ let sejoli_table;
 
                     data.__sejoli_ajax = 'single-user-point-table';
                     data.nonce = sejoli_admin.user_point.single_table.nonce;
-                    data.user_id = sejoli_admin.user_point.single_table.user_id;
+                    data.filter = sejoli.var.search;
                     data.backend  = true;
                 }
             },
@@ -139,6 +144,40 @@ let sejoli_table;
             sejoli.helper.filterData();
             sejoli_table.ajax.reload();
             $('.sejoli-form-filter-holder').hide();
+        });
+
+        /**
+         * Do export csv
+         */
+        $(document).on('click', '.export-csv', function() {
+
+            sejoli.helper.filterData();
+
+            var link       = $(this).attr('href');
+            var date_range = $('input[name="date-range"]').val();
+            var user_id    = $('input[name="user_id"]').val();
+            var product_id = $('select[name="product_id"]').val();
+            var type       = $('select[name="type"]').val();
+
+            if ( link ) {
+                if ( date_range ) {
+                    link += '&date_range='+date_range;
+                }
+                if ( user_id ) {
+                    link += '&user_id='+user_id;
+                }
+                if ( product_id ) {
+                    link += '&product_id='+product_id;
+                }
+                if ( type ) {
+                    link += '&type='+type;
+                }
+            }
+
+            window.location.replace(link);
+
+            return false;
+
         });
 
     });

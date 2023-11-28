@@ -1,3 +1,10 @@
+<?php
+    $date = date('Y-m-d',strtotime('-29 days')) . ' - ' . date('Y-m-d');
+    $export_link = add_query_arg(array(
+                        'sejoli-nonce'  => wp_create_nonce('sejoli-user-point-export'),
+                        'action'        => 'sejoli-user-point-csv-export'
+                    ),admin_url('admin-ajax.php'));
+?>
 <div class="wrap">
     <h1 class="wp-heading-inline">
         <?php _e('Data Poin User', 'sejoli'); ?>
@@ -6,7 +13,7 @@
         <div class='sejoli-form-action-holder'>
 
             <div class="sejoli-form-filter box" style='float:right;'>
-                <button type="button" name="button" class='export-csv button'><?php _e('Export CSV', 'sejoli'); ?></button>
+                <a href='<?php echo $export_link; ?>' name="button" class='export-csv button'><?php _e('Export CSV', 'sejoli'); ?></a>
                 <button type="button" name="button" class='button toggle-search'><?php _e('Filter Data', 'sejoli'); ?></button>
                 <div class="sejoli-form-filter-holder sejoli-form-float">
                     <select class="autosuggest filter" name="user_id"></select>
@@ -139,6 +146,28 @@ let sejoli_table;
             sejoli.helper.filterData();
             sejoli_table.ajax.reload();
             $('.sejoli-form-filter-holder').hide();
+        });
+
+        /**
+         * Do export csv
+         */
+        $(document).on('click', '.export-csv', function() {
+
+            sejoli.helper.filterData();
+
+            var link    = $(this).attr('href');
+            var user_id = $('select[name="user_id"]').val();
+
+            if ( link ) {
+                if ( user_id ) {
+                    link += '&user_id='+user_id;
+                }
+            }
+
+            window.location.replace(link);
+
+            return false;
+
         });
 
     });

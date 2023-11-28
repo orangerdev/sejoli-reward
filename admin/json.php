@@ -114,6 +114,71 @@ class Json extends \SEJOLI_REWARD\JSON {
     }
 
     /**
+	 * Create CSV file with user point data
+	 * Hooked via action wp_ajax_sejoli-user-point-csv-export, priority 1
+	 * @since 	1.1.3
+	 * @return 	void
+	 */
+	public function export_user_point_csv() {
+
+		if(
+			isset($_GET['sejoli-nonce']) &&
+			wp_verify_nonce($_GET['sejoli-nonce'], 'sejoli-user-point-export')
+		):
+
+			$table = [];
+			if ( isset( $_GET['user_id'] ) && !empty( $_GET['user_id'] ) ) :
+				$table['filter']['user_id'] = $_GET['user_id'];
+			endif;
+
+    		$return = sejoli_reward_get_all_user_point($table['filter']);
+
+    		$user_point_data = array();
+
+			$user_point_data[] = array(
+				'user_id',
+				'display_name',
+				'user_email',
+				'added_point',
+				'reduce_point',
+				'available_point'			
+			);
+
+            if(false !== $return['valid']) :
+
+                foreach($return['points'] as $_data) :
+
+                    $user_point_data[] = array(
+                        'user_id'         => $_data->user_id,
+                        'display_name'    => $_data->display_name,
+                        'user_email'      => $_data->user_email,
+                        'added_point'     => $_data->added_point,
+                        'reduce_point'    => $_data->reduce_point,
+                        'available_point' => $_data->available_point
+                    );
+
+                endforeach;
+
+            endif;
+
+			$filename = 'data-user-point-'.date('Y-m-d').'.csv';
+
+			header('Content-Type: text/csv');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
+
+			$fp = fopen('php://output', 'wb');
+			foreach($user_point_data as $_data) :
+				fputcsv($fp, $_data);
+			endforeach;
+			fclose($fp);
+
+			exit;
+
+		endif;
+
+	}
+
+    /**
      * Get point history for a user
      * Hooked via filter wp_ajax_sejoli-single-user-point-table, priority 1
      * @since   1.0.0
@@ -133,7 +198,18 @@ class Json extends \SEJOLI_REWARD\JSON {
 
         if(wp_verify_nonce($params['nonce'], 'sejoli-render-single-user-point-table')) :
 
-			$table['filter']['user_id']	= (empty($params['user_id'])) ? get_current_user_id() : intval($params['user_id']);
+			if ( isset( $_GET['date_range'] ) && !empty( $_GET['date_range'] ) ) :
+				$table['filter']['date-range'] = $_GET['date_range'];
+			endif;
+			if ( isset( $_GET['user_id'] ) && !empty( $_GET['user_id'] ) ) :
+				$table['filter']['user_id'] = $_GET['user_id'];
+			endif;
+			if ( isset( $_GET['product_id'] ) && !empty( $_GET['product_id'] ) ) :
+				$table['filter']['product_id'] = $_GET['product_id'];
+			endif;
+			if ( isset( $_GET['type'] ) && !empty( $_GET['type'] ) ) :
+				$table['filter']['type'] = $_GET['type'];
+			endif;
 
     		$return = sejoli_reward_get_history($table['filter'], $table);
 
@@ -207,6 +283,116 @@ class Json extends \SEJOLI_REWARD\JSON {
         exit;
     }
 
+    /**
+	 * Create CSV file with user point data
+	 * Hooked via action wp_ajax_sejoli-single-user-point-csv-export, priority 1
+	 * @since 	1.1.3
+	 * @return 	void
+	 */
+	public function export_single_user_point_csv() {
+
+		if(
+			isset($_GET['sejoli-nonce']) &&
+			wp_verify_nonce($_GET['sejoli-nonce'], 'sejoli-single-user-point-export')
+		):
+
+			$table = [];
+			if ( isset( $_GET['date_range'] ) && !empty( $_GET['date_range'] ) ) :
+				$table['filter']['date-range'] = $_GET['date_range'];
+			endif;
+			if ( isset( $_GET['user_id'] ) && !empty( $_GET['user_id'] ) ) :
+				$table['filter']['user_id'] = $_GET['user_id'];
+			endif;
+			if ( isset( $_GET['product_id'] ) && !empty( $_GET['product_id'] ) ) :
+				$table['filter']['product_id'] = $_GET['product_id'];
+			endif;
+			if ( isset( $_GET['type'] ) && !empty( $_GET['type'] ) ) :
+				$table['filter']['type'] = $_GET['type'];
+			endif;
+
+    		$return = sejoli_reward_get_history($table['filter'], $table);
+
+    		$single_user_point_data = array();
+
+			$single_user_point_data[] = array(
+				'created_at',
+				'detail',
+				'point',
+				'type'
+			);
+
+            if(false !== $return['valid']) :
+
+                foreach($return['points'] as $_data) :
+
+					$detail = '';
+
+					if('in' === $_data->type) :
+
+						switch($_data->meta_data['type']) :
+
+							case 'order' :
+
+								$product = sejolisa_get_product($_data->product_id);
+								$detail  = sprintf(
+												__('Poin dari order %s untuk produk %s', 'sejoli-reward'),
+												$_data->order_id,
+												$product->post_title
+										   );
+								break;
+
+							case 'affiliate' :
+
+								$product = sejolisa_get_product($_data->product_id);
+								$detail  = sprintf(
+												__('Poin dari affiliasi order %s untuk produk %s, tier %s', 'sejoli-reward'),
+												$_data->order_id,
+												$product->post_title,
+												$_data->meta_data['tier']
+										  );
+								break;
+
+							case 'manual' :
+							
+								$detail 	= $_data->meta_data['note'] . '. ' . $_data->meta_data['input'];
+								break;
+
+						endswitch;
+
+					else :
+
+						$detail = $_data->meta_data['note'];
+
+					endif;
+
+                    $single_user_point_data[] = array(
+						'created_at' => date('Y/m/d', strtotime($_data->created_at)),
+						'detail'   	 => $detail,
+                        'point' 	 => $_data->point,
+                        'type'  	 => $_data->type
+                    );
+
+                endforeach;
+
+            endif;
+
+			$filename = 'data-single-user-point-'.date('Y-m-d').'-'.$_GET['user_id'].'.csv';
+
+			header('Content-Type: text/csv');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
+
+			$fp = fopen('php://output', 'wb');
+			foreach($single_user_point_data as $_data) :
+				fputcsv($fp, $_data);
+			endforeach;
+			fclose($fp);
+
+			exit;
+
+		endif;
+
+	}
+
 	/**
      * Get reward exchange data
      * Hooked via filter wp_ajax_sejoli-reward-table, priority 1
@@ -268,6 +454,80 @@ class Json extends \SEJOLI_REWARD\JSON {
 
         exit;
     }
+
+    /**
+	 * Create CSV file with reward exchanges data
+	 * Hooked via action wp_ajax_sejoli-reward-exchanges-csv-export, priority 1
+	 * @since 	1.1.3
+	 * @return 	void
+	 */
+	public function export_reward_exchanges_csv() {
+
+		if(
+			isset($_GET['sejoli-nonce']) &&
+			wp_verify_nonce($_GET['sejoli-nonce'], 'sejoli-reward-exchanges-export')
+		):
+
+			$table = [];
+			if ( isset( $_GET['date_range'] ) && !empty( $_GET['date_range'] ) ) :
+				$table['filter']['date-range'] = $_GET['date_range'];
+			endif;
+			if ( isset( $_GET['reward_id'] ) && !empty( $_GET['reward_id'] ) ) :
+				$table['filter']['reward_id'] = $_GET['reward_id'];
+			endif;
+			if ( isset( $_GET['user_id'] ) && !empty( $_GET['user_id'] ) ) :
+				$table['filter']['user_id'] = $_GET['user_id'];
+			endif;
+
+			$table['filter']['type']        = 'out';
+			$table['filter']['valid_point'] = NULL;
+
+    		$return = sejoli_reward_get_history($table['filter'], $table);
+
+    		$reward_exchange_data = array();
+
+			$reward_exchange_data[] = array(
+				'user_id',
+				'display_name',
+				'user_email',
+				'created_at',
+				'detail',
+				'point'			
+			);
+
+            if(false !== $return['valid']) :
+
+                foreach($return['points'] as $exchange_data) :
+
+                    $reward_exchange_data[] = array(
+						'user_id'       => $exchange_data->user_id,
+                        'display_name'  => $exchange_data->display_name,
+                        'user_email'    => $exchange_data->user_email,
+						'created_at' 	=> date('Y/m/d', strtotime($exchange_data->created_at)),
+						'detail'   	 	=> $exchange_data->meta_data['note'],
+                        'point' 	 	=> $exchange_data->point                    
+                    );
+
+                endforeach;
+
+            endif;
+
+			$filename = 'data-reward-exchange-'.date('Y-m-d').'.csv';
+
+			header('Content-Type: text/csv');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
+
+			$fp = fopen('php://output', 'wb');
+			foreach($reward_exchange_data as $_data) :
+				fputcsv($fp, $_data);
+			endforeach;
+			fclose($fp);
+
+			exit;
+
+		endif;
+
+	}
 
 	/**
      * Ger reward options
