@@ -28,6 +28,10 @@ Will come later
 
 == Changelog ==
 
+= 1.2.1 =
+- Fix bug export data poin user, detail poin user, penukaran poin
+- Fix bug filter data detail poin user
+
 = 1.2.0 =
 - Add feature to set expired point
 
