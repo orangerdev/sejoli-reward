@@ -28,6 +28,10 @@ Will come later
 
 == Changelog ==
 
+= 1.2.2 =
+- Fix bug history poin user
+- Fix bug calculating poin by quantity
+
 = 1.2.1 =
 - Fix bug export data poin user, detail poin user, penukaran poin
 - Fix bug filter data detail poin user

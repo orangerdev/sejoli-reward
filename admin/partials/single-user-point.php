@@ -83,6 +83,7 @@ let sejoli_table;
 
                     data.__sejoli_ajax = 'single-user-point-table';
                     data.nonce = sejoli_admin.user_point.single_table.nonce;
+                    data.user_id = $('input[name="user_id"]').val();
                     data.filter = sejoli.var.search;
                     data.backend  = true;
                 }
