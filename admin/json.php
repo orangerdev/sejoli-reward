@@ -201,16 +201,13 @@ class Json extends \SEJOLI_REWARD\JSON {
 			if ( isset( $_GET['date_range'] ) && !empty( $_GET['date_range'] ) ) :
 				$table['filter']['date-range'] = $_GET['date_range'];
 			endif;
-			if ( isset( $_GET['user_id'] ) && !empty( $_GET['user_id'] ) ) :
-				$table['filter']['user_id'] = $_GET['user_id'];
-			endif;
+			$table['filter']['user_id']	= (empty($params['user_id'])) ? get_current_user_id() : intval($params['user_id']);
 			if ( isset( $_GET['product_id'] ) && !empty( $_GET['product_id'] ) ) :
 				$table['filter']['product_id'] = $_GET['product_id'];
 			endif;
 			if ( isset( $_GET['type'] ) && !empty( $_GET['type'] ) ) :
 				$table['filter']['type'] = $_GET['type'];
 			endif;
-
     		$return = sejoli_reward_get_history($table['filter'], $table);
 
             if(false !== $return['valid']) :

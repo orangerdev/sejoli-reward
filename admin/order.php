@@ -229,7 +229,7 @@ class Order {
                 'product_id'   => $product_id,
                 'order_status' => $order_data['status'],
                 'user_id'      => intval($affiliate_id),
-                'point'        => $point,
+                'point'        => $order_data['quantity'] * $point,
                 'reward_id'    => 0,
                 'valid_point'  => false,
                 'meta_data'    => array(
