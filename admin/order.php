@@ -293,8 +293,9 @@ class Order {
      */
     public function add_point_info($content, $media, $recipient_type, $order_detail) {
 
+        $order_status = isset($order_detail['order_data']) ? $order_detail['order_data']['status'] : '';
         if(
-            'completed' === $order_detail['order_data']['status'] &&
+            'completed' === $order_status &&
             in_array($recipient_type, array('buyer', 'affiliate'))
         ) :
 

@@ -28,6 +28,9 @@ Will come later
 
 == Changelog ==
 
+= 1.2.3 =
+- Fix bug error when register
+
 = 1.2.2 =
 - Fix bug history poin user
 - Fix bug calculating poin by quantity
