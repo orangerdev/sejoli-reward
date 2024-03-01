@@ -12,7 +12,7 @@ class CLI
      * @param  mixed    $fields
      * @return void
      */
-    protected function render($data, $view = 'table', $fields) {
+    protected function render($data, $fields, $view = 'table') {
 
         \WP_CLI\Utils\format_items(
             $view,
