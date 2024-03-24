@@ -89,13 +89,13 @@ class Order {
 
         $enable_reward = false;
 
-        if($product_group_setup){
+        if(is_array($product_group_setup)){
 
             if(array_key_exists($product_id, $product_group_setup['per_product'])) :
 
                 $product_group_setup = $product_group_setup['per_product'][$product_id];
 
-                if($product_group_setup['reward_enable']) :
+                if(false !== $product_group_setup['reward_enable']) :
                     $enable_reward        = true;
                     $product_reward_point = absint($product_group_setup['reward_point']);
                     $calculate = 'user-group-per-product';
@@ -106,8 +106,8 @@ class Order {
         }
 
         if(
-            false === $enable_reward &&
-            $product_group_setup['reward_enable']
+            false === $enable_reward && is_array($product_group_setup) &&
+            false !== $product_group_setup['reward_enable']
         ) :
             $enable_reward        = true;
             $product_reward_point = absint($product_group_setup['reward_point']);
@@ -293,8 +293,9 @@ class Order {
      */
     public function add_point_info($content, $media, $recipient_type, $order_detail) {
 
+        $order_status = isset($order_detail['order_data']) ? $order_detail['order_data']['status'] : '';
         if(
-            'completed' === $order_detail['order_data']['status'] &&
+            'completed' === $order_status &&
             in_array($recipient_type, array('buyer', 'affiliate'))
         ) :
 
