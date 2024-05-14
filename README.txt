@@ -28,6 +28,9 @@ Will come later
 
 == Changelog ==
 
+= 1.2.5 =
+- Fix bug expired point data
+
 = 1.2.4 =
 - Fix bug compatibility with php 8.0
 

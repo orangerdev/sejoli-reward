@@ -97,7 +97,6 @@ class Admin {
 			$point = absint($point_response['point']->available_point);
 		endif;
 
-
 		$admin_bar->add_menu(array(
 			'id'	=> 'sejoli-point',
 			'title'	=> sprintf(__('Poin anda : %s', 'sejoli'), $point),
