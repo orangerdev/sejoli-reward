@@ -398,7 +398,7 @@ Class Reward extends \SEJOLI_REWARD\Model
         if($no_exp_date === false):
             
         else:
-            $query = $query->where('created_at', '<', $no_exp_date);
+            $query = $query->where('created_at', '>', $no_exp_date);
         endif;
 
         $query        = self::set_filter_query( $query );
@@ -459,7 +459,7 @@ Class Reward extends \SEJOLI_REWARD\Model
 
         else:
 
-            $query = $query->where('created_at', '<', $no_exp_date);
+            $query = $query->where('created_at', '>', $no_exp_date);
 
         endif;
 
@@ -507,17 +507,15 @@ Class Reward extends \SEJOLI_REWARD\Model
                     )
                     ->where('valid_point', true)
                     ->where('user_id', self::$user_id);
+        
 
         $no_exp_date = get_option('point_expired_date', false); 
             
-            
-
-        if($no_exp_date === false):
-            
+        if(boolval($no_exp_date) === false) :
             
         else:
 
-            $query = $query->where('created_at', '<', $no_exp_date);
+            $query = $query->where('created_at', '>', $no_exp_date);
 
         endif;
 
