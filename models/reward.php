@@ -393,12 +393,22 @@ Class Reward extends \SEJOLI_REWARD\Model
 
         // ini untuk tampilan detail point 
         
-        $no_exp_date = get_option('point_expired_date', false); 
+        $no_exp_date = get_option('point_expired_date', false);             
         
-        if($no_exp_date === false):
+        if(boolval($no_exp_date) === false) :
             
         else:
-            $query = $query->where('created_at', '>', $no_exp_date);
+
+            $now = date('Y-m-d');
+
+            if ($no_exp_date > $now) {
+                // Jika $no_exp_date lebih besar dari tanggal saat ini
+                $query = $query->where('created_at', '<', $no_exp_date);
+            } else {
+                // Jika $no_exp_date lebih kecil atau sudah melewati tanggal saat ini
+                $query = $query->where('created_at', '>', $no_exp_date);
+            }
+
         endif;
 
         $query        = self::set_filter_query( $query );
@@ -454,12 +464,20 @@ Class Reward extends \SEJOLI_REWARD\Model
                     ->groupBy('user_id');
 
         $no_exp_date = get_option('point_expired_date', false);             
-
+        
         if(boolval($no_exp_date) === false) :
-
+            
         else:
 
-            $query = $query->where('created_at', '>', $no_exp_date);
+            $now = date('Y-m-d');
+
+            if ($no_exp_date > $now) {
+                // Jika $no_exp_date lebih besar dari tanggal saat ini
+                $query = $query->where('created_at', '<', $no_exp_date);
+            } else {
+                // Jika $no_exp_date lebih kecil atau sudah melewati tanggal saat ini
+                $query = $query->where('created_at', '>', $no_exp_date);
+            }
 
         endif;
 
