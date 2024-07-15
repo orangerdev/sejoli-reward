@@ -28,6 +28,9 @@ Will come later
 
 == Changelog ==
 
+= 1.2.7 =
+- Fix bug total poin not show in admin bar
+
 = 1.2.6 =
 - Fix bug query data baesd on expired point data set
 

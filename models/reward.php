@@ -533,7 +533,15 @@ Class Reward extends \SEJOLI_REWARD\Model
             
         else:
 
-            $query = $query->where('created_at', '>', $no_exp_date);
+            $now = date('Y-m-d');
+
+            if ($no_exp_date > $now) {
+                // Jika $no_exp_date lebih besar dari tanggal saat ini
+                $query = $query->where('created_at', '<', $no_exp_date);
+            } else {
+                // Jika $no_exp_date lebih kecil atau sudah melewati tanggal saat ini
+                $query = $query->where('created_at', '>', $no_exp_date);
+            }
 
         endif;
 
