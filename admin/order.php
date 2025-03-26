@@ -165,15 +165,15 @@ class Order {
      */
     public function add_reward_point_for_affiliate($commission, $commission_set, $order_data, $tier, $affiliate_id) {
 
-        $product_id                = $this->product->ID;
-        $per_product_commissions   = $product_commissions = array();
-        $product_commissions       = $this->commissions;
-        $affiliate_group           = sejolisa_get_user_group($affiliate_id);
-        $general_group_commissions = $affiliate_group['commissions'];
+        $product_id = $this->product->ID;
+        $per_product_commissions = array();
+        $product_commissions = $this->commissions;
+        $affiliate_group = sejolisa_get_user_group($affiliate_id);
+        $general_group_commissions = isset($affiliate_group['commissions']) ? $affiliate_group['commissions'] : [];
 
-        if(array_key_exists($product_id, $affiliate_group['per_product'])) :
+        if (is_array($affiliate_group) && array_key_exists('per_product', $affiliate_group) && array_key_exists($product_id, $affiliate_group['per_product'])) {
             $per_product_commissions = $affiliate_group['per_product'][$product_id]['commissions'];
-        endif;
+        }
 
         $enable_reward = false;
         $calculate = $point = null;
