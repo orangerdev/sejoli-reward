@@ -74,7 +74,7 @@ class Checkout {
         else :
             ?>
             <tr style="padding-top: 1em; display: block;">
-                <td colspan="2" style="width: 50%; padding: 0.78571429em 0.78571429em;">
+                <td style="width: 50%; padding: 0.78571429em 0.78571429em;">
                     <?php if(false === $product->enable_quantity) : ?>
                     <p><?php _e('Total poin yang anda dapatkan per satu item', 'sejoli-reward'); ?></p>
                     <?php else : ?>

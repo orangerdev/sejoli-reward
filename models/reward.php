@@ -2,7 +2,6 @@
 
 namespace SEJOLI_REWARD\Model;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 /**
  * Abandon model class
  * @since   1.0.0
@@ -173,37 +172,43 @@ Class Reward extends \SEJOLI_REWARD\Model
      * @return  boolean
      */
     static protected function check_existing_point() {
+    
+        global $wpdb;
 
-        parent::$table = self::$table;
+        $table = $wpdb->prefix . self::$table;
+        $query = "
+            SELECT *
+            FROM $table
+            WHERE order_id = %d
+              AND user_id = %d
+              AND type = %s
+              AND valid_point = true
+            LIMIT 1
+        ";
 
-        $data = Capsule::table(self::table())
-                    ->where(array(
-                        'order_id'    => self::$order_id,
-                        'user_id'     => self::$user->ID,
-                        'type'        => self::$type,
-                        'valid_point' => true,
-                    ))
-                    ->first();
+        $data = $wpdb->get_var($wpdb->prepare($query, self::$order_id, self::$user->ID, self::$type));
 
         return boolval($data);
+
     }
+
 
     /**
      * Add point with IN type
      * @since   1.0.0
      */
     static public function add_point() {
-
+     
         self::set_action('add');
         self::validate();
 
-        if(false !== self::$valid) :
-
+        if (false !== self::$valid) {
             self::$type = 'in';
 
-            if(false === self::check_existing_point()) :
+            if (false === self::check_existing_point()) {
+                global $wpdb;
 
-                parent::$table = self::$table;
+                $table = $wpdb->prefix . self::$table;
 
                 $point = [
                     'created_at'   => current_time('mysql'),
@@ -218,28 +223,19 @@ Class Reward extends \SEJOLI_REWARD\Model
                     'valid_point'  => self::$valid_point
                 ];
 
-                $point['ID'] = Capsule::table(self::table())
-                                ->insertGetId($point);
+                $wpdb->insert($table, $point);
+                $point['ID'] = $wpdb->insert_id;
 
                 self::set_valid(true);
                 self::set_respond('point', $point);
-
-            else :
-
+            } else {
                 self::set_valid(false);
-                self::set_message(
-                    sprintf(
-                        __('Point for order %s and user %s already exists', 'sejoli'),
-                        self::$order_id,
-                        self::$user->ID
-                    )
-                );
-
-            endif;
-
-        endif;
+                self::set_message(sprintf(__('Point for order %s and user %s already exists', 'sejoli-reward'), self::$order_id, self::$user->ID));
+            }
+        }
 
         return new static;
+
     }
 
     /**
@@ -247,13 +243,14 @@ Class Reward extends \SEJOLI_REWARD\Model
      * @since   1.1.0
      */
     static public function manual_input() {
-
+     
         self::set_action('manual-input');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) {
+            global $wpdb;
 
-            parent::$table = self::$table;
+            $table = $wpdb->prefix . self::$table;
 
             $point = [
                 'created_at'   => current_time('mysql'),
@@ -268,15 +265,15 @@ Class Reward extends \SEJOLI_REWARD\Model
                 'meta_data'    => serialize(self::$meta_data),
             ];
 
-            $point['ID'] = Capsule::table(self::table())
-                            ->insertGetId($point);
+            $wpdb->insert($table, $point);
+            $point['ID'] = $wpdb->insert_id;
 
-            self::set_valid     (true);
-            self::set_respond   ('point', $point);
-
-        endif;
+            self::set_valid(true);
+            self::set_respond('point', $point);
+        }
 
         return new static;
+
     }
 
     /**
@@ -284,54 +281,51 @@ Class Reward extends \SEJOLI_REWARD\Model
      * @since   1.0.0
      */
     static public function get_single_point() {
-
+     
         self::set_action('get-single');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) {
+            global $wpdb;
 
-            parent::$table = self::$table;
+            $table = $wpdb->prefix . self::$table;
+            $query = "
+                SELECT *
+                FROM $table
+                WHERE order_id = %d
+                  AND user_id = %d
+                  AND type = 'in'
+                  AND valid_point = true
+                LIMIT 1
+            ";
 
-            $query = Capsule::table(self::table())
-                            ->where(array(
-                                'order_id'    => self::$order_id,
-                                'user_id'     => self::$user->ID,
-                                'type'        => 'in',
-                                'valid_point' => true
-                            ));
+            $point = $wpdb->get_row($wpdb->prepare($query, self::$order_id, self::$user->ID));
 
-            $point = $query->first();
-
-            if($point) :
-
+            if ($point) {
                 self::set_valid(true);
                 self::set_respond('point', $point);
+            } else {
+                $query = "
+                    SELECT *
+                    FROM $table
+                    WHERE order_id = %d
+                      AND user_id = %d
+                    LIMIT 1
+                ";
 
-            else :
+                $point = $wpdb->get_row($wpdb->prepare($query, self::$order_id, self::$user->ID));
 
-                $query = Capsule::table(self::table())
-                                ->where(array(
-                                    'order_id'    => self::$order_id,
-                                    'user_id'     => self::$user->ID,
-                                ))
-                            ->first();
-
-                if($point) :
-
+                if ($point) {
                     self::set_valid(true);
                     self::set_respond('point', $point);
-
-                else :
-
+                } else {
                     self::set_valid(false);
-
-                endif;
-
-            endif;
-
-        endif;
+                }
+            }
+        }
 
         return new static;
+
     }
 
     /**
@@ -339,35 +333,32 @@ Class Reward extends \SEJOLI_REWARD\Model
      * @since   1.0.0
      */
     static public function get_point_detail() {
-
+     
         self::set_action('get-detail');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) {
+            global $wpdb;
 
-            parent::$table = self::$table;
+            $table = $wpdb->prefix . self::$table;
+            $query = "
+                SELECT *
+                FROM $table
+                WHERE ID = %d
+            ";
 
-            $query = Capsule::table(self::table())
-                            ->where(array(
-                                'ID'    => self::$id,
-                            ));
+            $point = $wpdb->get_row($wpdb->prepare($query, self::$id));
 
-            $point = $query->first();
-
-            if($point) :
-
+            if ($point) {
                 self::set_valid(true);
                 self::set_respond('point', $point);
-
-            else :
-
+            } else {
                 self::set_valid(false);
-
-            endif;
-
-        endif;
+            }
+        }
 
         return new static;
+    
     }
 
     /**
@@ -379,21 +370,14 @@ Class Reward extends \SEJOLI_REWARD\Model
 
         global $wpdb;
 
-        parent::$table = self::$table;
+        $table = $wpdb->prefix . self::$table;
+        $query = "
+            SELECT reward.*, user.display_name, user.user_email
+            FROM $table AS reward
+            JOIN {$wpdb->users} AS user ON user.ID = reward.user_id
+        ";
 
-        $query        = Capsule::table( Capsule::raw( self::table() . ' AS reward' ))
-                        ->select(
-                            'reward.*',
-                            'user.display_name',
-                            'user.user_email'
-                        )
-                        ->join(
-                            $wpdb->users . ' AS user', 'user.ID', '=', 'reward.user_id'
-                        );
-
-        // ini untuk tampilan detail point 
-        
-        $no_exp_date = get_option('point_expired_date', false);             
+        $no_exp_date = get_option('point_expired_date', false);           
         
         if(boolval($no_exp_date) === false) :
             
@@ -403,32 +387,34 @@ Class Reward extends \SEJOLI_REWARD\Model
 
             if ($no_exp_date > $now) {
                 // Jika $no_exp_date lebih besar dari tanggal saat ini
-                $query = $query->where('created_at', '<', $no_exp_date);
+                $query .= " WHERE created_at < %s";
             } else {
                 // Jika $no_exp_date lebih kecil atau sudah melewati tanggal saat ini
-                $query = $query->where('created_at', '>', $no_exp_date);
+                $query .= " WHERE created_at > %s";
             }
 
         endif;
 
-        $query        = self::set_filter_query( $query );
-        $recordsTotal = $query->count();
-        $query        = self::set_length_query($query);
-        $points       = $query->get()->toArray();
+        $query = self::set_filter_query($query);
+        $query = self::set_length_query($query);
 
-        if ( $points ) :
+        $results = $wpdb->get_results($wpdb->prepare($query, $no_exp_date));
+        $recordsTotal = is_array($results) ? count($results) : 0;
+
+        if ($results) {
             self::set_respond('valid', true);
-            self::set_respond('points', $points);
+            self::set_respond('points', $results);
             self::set_respond('recordsTotal', $recordsTotal);
             self::set_respond('recordsFiltered', $recordsTotal);
-        else:
+        } else {
             self::set_respond('valid', false);
             self::set_respond('points', []);
             self::set_respond('recordsTotal', 0);
             self::set_respond('recordsFiltered', 0);
-        endif;
+        }
 
         return new static;
+
     }
 
     /**
@@ -439,65 +425,51 @@ Class Reward extends \SEJOLI_REWARD\Model
 
         global $wpdb;
 
-        parent::$table = self::$table;
+        $table = $wpdb->prefix . self::$table;
 
-        $query  = Capsule::table( Capsule::raw( self::table() . ' AS reward' ))
-                    ->select(
-                        'reward.user_id',
-                        'user.display_name',
-                        'user.user_email',
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" THEN point ELSE 0 END) AS added_point'
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "out" THEN point ELSE 0 END) AS reduce_point'
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" THEN point ELSE -point END) AS available_point'
-                        )
-                    )
-                    ->join(
-                        $wpdb->users . ' AS user', 'user.ID', '=', 'reward.user_id'
-                    )
-                    ->where('valid_point', true)
-                    ->orderBy('available_point', 'DESC')
-                    ->groupBy('user_id');
+        $query = "
+            SELECT reward.user_id, user.display_name, user.user_email,
+                SUM(CASE WHEN type = 'in' THEN point ELSE 0 END) AS added_point,
+                SUM(CASE WHEN type = 'out' THEN point ELSE 0 END) AS reduce_point,
+                SUM(CASE WHEN type = 'in' THEN point ELSE -point END) AS available_point
+            FROM $table AS reward
+            JOIN {$wpdb->users} AS user ON user.ID = reward.user_id
+            WHERE valid_point = true
+        ";
 
-        $no_exp_date = get_option('point_expired_date', false);             
-        
-        if(boolval($no_exp_date) === false) :
-            
-        else:
+        $no_exp_date = get_option('point_expired_date', false);            
 
+        if (boolval($no_exp_date) !== false) : // Only proceed if $no_exp_date is not false
             $now = date('Y-m-d');
 
             if ($no_exp_date > $now) {
-                // Jika $no_exp_date lebih besar dari tanggal saat ini
-                $query = $query->where('created_at', '<', $no_exp_date);
+                // If $no_exp_date is greater than today, add the condition for "created_at < $no_exp_date"
+                $query .= " AND created_at < %s";
             } else {
-                // Jika $no_exp_date lebih kecil atau sudah melewati tanggal saat ini
-                $query = $query->where('created_at', '>', $no_exp_date);
+                // If $no_exp_date is less than or equal to today, add the condition for "created_at > $no_exp_date"
+                $query .= " AND created_at > %s";
             }
-
         endif;
 
+        // Apply additional filters
         $query  = self::set_filter_query( $query );
 
-        $result = $query->get();
+        $query .= "GROUP BY user_id
+            ORDER BY available_point DESC";
 
-        if($result) :
+        // Prepare the query, passing $no_exp_date correctly
+        $results = $wpdb->get_results($wpdb->prepare($query, $no_exp_date));
 
+        if ($results) {
             self::set_valid(true);
-            self::set_respond('points', $result);
-
-        else :
-
+            self::set_respond('points', $results);
+        } else {
             self::set_valid(false);
-            self::set_message( __('No point data', 'sejoli-reward'));
-
-        endif;
+            self::set_message(__('No point data', 'sejoli-reward'));
+        }
 
         return new static;
+
     }
 
     /**
@@ -505,61 +477,49 @@ Class Reward extends \SEJOLI_REWARD\Model
      * @since   1.0.0
      */
     static public function get_available_point_for_single_user() {
-
+     
         global $wpdb;
 
-        parent::$table = self::$table;
+        $table = $wpdb->prefix . self::$table; 
 
-        $query  = Capsule::table( self::table() )
-                    ->select(
-                        'user_id',
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" THEN point ELSE 0 END) AS added_point'
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "out" THEN point ELSE 0 END) AS reduce_point'
-                        ),
-                        Capsule::raw(
-                            'SUM(CASE WHEN type = "in" THEN point ELSE -point END) AS available_point'
-                        )
-                    )
-                    ->where('valid_point', true)
-                    ->where('user_id', self::$user_id);
-        
+        $query = "
+            SELECT 
+                user_id,
+                SUM(CASE WHEN type = 'in' THEN point ELSE 0 END) AS added_point,
+                SUM(CASE WHEN type = 'out' THEN point ELSE 0 END) AS reduce_point,
+                SUM(CASE WHEN type = 'in' THEN point ELSE -point END) AS available_point
+            FROM $table
+            WHERE valid_point = 1
+            AND user_id = %d
+        ";
 
-        $no_exp_date = get_option('point_expired_date', false); 
-            
-        if(boolval($no_exp_date) === false) :
-            
-        else:
-
+        $no_exp_date = get_option('point_expired_date', false);
+        if (boolval($no_exp_date) !== false) :
             $now = date('Y-m-d');
 
-            if ($no_exp_date > $now) {
-                // Jika $no_exp_date lebih besar dari tanggal saat ini
-                $query = $query->where('created_at', '<', $no_exp_date);
-            } else {
-                // Jika $no_exp_date lebih kecil atau sudah melewati tanggal saat ini
-                $query = $query->where('created_at', '>', $no_exp_date);
-            }
-
+            if ($no_exp_date > $now) :
+                $query .= " AND created_at < %s";
+                $query = $wpdb->prepare($query, self::$user_id, $no_exp_date);
+            else:
+                $query .= " AND created_at > %s";
+                $query = $wpdb->prepare($query, self::$user_id, $no_exp_date);
+            endif;
+        else:
+            $query = $wpdb->prepare($query, self::$user_id);  // Prepare query with user_id
         endif;
 
-        $query = $query->first();
+        $results = $wpdb->get_row($query);
 
-        if($query) :
-
+        if ($results) {
             self::set_valid(true);
-            self::set_respond('point', $query);
-
-        else :
-
+            self::set_respond('point', $results);
+        } else {
             self::set_valid(false);
-            self::set_message( sprintf( __('No point for user %s', 'sejoli-reward'), self::$user_id));
-
-        endif;
+            self::set_message(sprintf(__('No point for user %s', 'sejoli-reward'), self::$user_id));
+        }
 
         return new static;
+
     }
 
     /**
@@ -567,13 +527,14 @@ Class Reward extends \SEJOLI_REWARD\Model
      * @since   1.0.0
      */
     static public function reduce_point() {
-
+     
         self::set_action('reduce');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) {
+            global $wpdb;
 
-            parent::$table = self::$table;
+            $table = $wpdb->prefix . self::$table;
 
             $point = [
                 'created_at'   => current_time('mysql'),
@@ -588,15 +549,15 @@ Class Reward extends \SEJOLI_REWARD\Model
                 'valid_point'  => self::$valid_point
             ];
 
-            $point['ID'] = Capsule::table(self::table())
-                            ->insertGetId($point);
+            $wpdb->insert($table, $point);
+            $point['ID'] = $wpdb->insert_id;
 
             self::set_valid(true);
             self::set_respond('point', $point);
-
-        endif;
+        }
 
         return new static;
+
     }
 
     /**
@@ -604,25 +565,25 @@ Class Reward extends \SEJOLI_REWARD\Model
      * @since
      */
     static public function update_valid_point() {
-
+     
         self::set_action('update-valid-point');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) {
+            global $wpdb;
 
-            parent::$table = self::$table;
-
-            Capsule::table(self::table())
-                            ->where('order_id', self::$order_id)
-                            ->update(array(
-                                'valid_point'   => self::$valid_point
-                            ));
+            $table = $wpdb->prefix . self::$table;
+            $wpdb->update(
+                $table,
+                ['valid_point' => self::$valid_point],
+                ['order_id' => self::$order_id]
+            );
 
             self::set_valid(true);
-
-        endif;
+        }
 
         return new static;
+
     }
 
     /**
@@ -630,26 +591,25 @@ Class Reward extends \SEJOLI_REWARD\Model
      * @since
      */
     static public function update_exchange_valid_point() {
-
+     
         self::set_action('update-exchange-valid-point');
         self::validate();
 
-        if(false !== self::$valid) :
+        if (false !== self::$valid) {
+            global $wpdb;
 
-            parent::$table = self::$table;
-
-            Capsule::table(self::table())
-                            ->where('ID', self::$id)
-                            ->where('type', 'out')
-                            ->update(array(
-                                'valid_point'   => self::$valid_point
-                            ));
+            $table = $wpdb->prefix . self::$table;
+            $wpdb->update(
+                $table,
+                ['valid_point' => self::$valid_point],
+                ['ID' => self::$id, 'type' => 'out']
+            );
 
             self::set_valid(true);
-
-        endif;
+        }
 
         return new static;
+
     }
     
     /**
