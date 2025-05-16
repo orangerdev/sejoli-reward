@@ -238,25 +238,29 @@ Class Model
      */
     static protected function set_length_query($query) {
 
-        if ( 0 < self::$filter['start'] ) :
-            $start = intval( self::$filter['start'] );
-            $query->offset( $start );
-        endif;
-
-        if ( 0 < self::$filter['length']) :
-            $length = intval( self::$filter['length'] );
-            $query->limit( $length );
-        endif;
-
+        // Apply ordering
         if(!is_null(self::$filter['order']) && is_array(self::$filter['order'])) :
             foreach(self::$filter['order'] as $column => $sort) :
-                $query->orderBy($column, $sort);
+                $query .= " ORDER BY $column $sort";  // Add ORDER BY clause
             endforeach;
         else :
-            $query->orderBy( 'ID', 'desc' );
+            $query .= " ORDER BY ID DESC";  // Default order by ID descending
+        endif;
+        
+        // Apply offset (start)
+        if ( 0 < self::$filter['start'] ) :
+            $start = intval( self::$filter['start'] );
+            $query .= " OFFSET $start";  // Add OFFSET to the SQL query
+        endif;
+
+        // Apply limit (length)
+        if ( 0 < self::$filter['length']) :
+            $length = intval( self::$filter['length'] );
+            $query .= " LIMIT $length";  // Add LIMIT to the SQL query
         endif;
 
         return $query;
+
     }
 
     /**
@@ -264,36 +268,27 @@ Class Model
      */
     static protected function set_filter_query($query)
     {
+        // Apply search filters
         if ( !is_null( self::$filter['search'] ) && is_array( self::$filter['search'] ) ) :
-
             foreach ( self::$filter['search'] as $key => $value ) :
-
                 if ( !empty( $value['val'] ) ) :
-
                     if(is_array($value['val'])) :
-
                         if(isset($value['compare']) && 'NOT IN' === $value['compare'] ) :
-                            $query->whereNotIn($value['name'], $value['val']);
+                            $query .= " AND $value[name] NOT IN (" . implode(',', array_map('esc_sql', $value['val'])) . ")"; // For NOT IN
                         else :
-                            $query->whereIn( $value['name'],$value['val'] );
+                            $query .= " AND $value[name] IN (" . implode(',', array_map('esc_sql', $value['val'])) . ")"; // For IN
                         endif;
-
                     elseif(isset($value['compare']) && !is_null($value['compare'])) :
-
                         if('NOT IN' === $value['compare'] ) :
-                            $query->whereNotIn($value['name'], $value['val']);
+                            $query .= " AND $value[name] NOT IN (" . implode(',', array_map('esc_sql', $value['val'])) . ")";
                         else :
-                            $query->where( $value['name'], $value['compare'], $value['val']);
+                            $query .= " AND $value[name] $value[compare] '" . esc_sql($value['val']) . "'";  // Apply custom comparison
                         endif;
-
                     else :
-
-                        $query->where( $value['name'],$value['val'] );
-
+                        $query .= " AND $value[name] = '" . esc_sql($value['val']) . "'";  // Simple equality check
                     endif;
-
                 elseif( false === boolval($value['val']) ) :
-                    $query->where( $value['name'],$value['val'] );
+                    $query .= " AND $value[name] = '" . esc_sql($value['val']) . "'";  // Check for boolean false
                 endif;
             endforeach;
         endif;

@@ -28,6 +28,10 @@ Will come later
 
 == Changelog ==
 
+= 1.2.8 =
+- Support php 8.3
+- Fix performance query
+
 = 1.2.7 =
 - Fix bug total poin not show in admin bar
 

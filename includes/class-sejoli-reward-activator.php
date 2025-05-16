@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as Capsule;
-
 /**
  * Fired during plugin activation.
  *
@@ -23,25 +21,39 @@ class Sejoli_Reward_Activator {
 	 */
 	public static function activate() {
 
-		global $wpdb;
+        global $wpdb;
 
-		$table = $wpdb->prefix . 'sejolisa_reward_points';
+        $table = $wpdb->prefix . 'sejolisa_reward_points';
 
-		if(!Capsule::schema()->hasTable( $table )):
-            Capsule::schema()->create( $table, function($table){
-                $table->increments  ('ID');
-                $table->date        ('created_at');
-                $table->integer     ('order_id');
-                $table->string      ('order_status');
-                $table->integer     ('product_id');
-                $table->integer     ('user_id');
-                $table->integer     ('point');
-                $table->enum        ('type', array('in', 'out'));
-                $table->integer     ('reward_id')->default(0);
-                $table->text        ('meta_data')->nullable();
-				$table->boolean		('valid_point');
-            });
+        // Check if the table already exists
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table'") != $table) :
+            
+            // Table does not exist, create it
+            $charset_collate = $wpdb->get_charset_collate();
+
+            $sql = "
+            CREATE TABLE $table (
+                ID INT(11) NOT NULL AUTO_INCREMENT,
+                created_at DATE NOT NULL,
+                order_id INT(11) NOT NULL,
+                order_status VARCHAR(255) NOT NULL,
+                product_id INT(11) NOT NULL,
+                user_id INT(11) NOT NULL,
+                point INT(11) NOT NULL,
+                type ENUM('in', 'out') NOT NULL,
+                reward_id INT(11) DEFAULT 0,
+                meta_data TEXT NULL,
+                valid_point BOOLEAN NOT NULL,
+                PRIMARY KEY (ID)
+            ) $charset_collate;
+            ";
+
+            // Run the query to create the table
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
+
         endif;
-	}
+
+    }
 
 }

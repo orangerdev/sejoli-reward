@@ -82,7 +82,6 @@ function sejoli_reward_get_user_point($user_id = 0) {
                         ->set_user_id($user_id)
                         ->get_available_point_for_single_user()
                         ->respond();
-
     return $response;
 }
 
